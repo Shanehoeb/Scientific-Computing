@@ -5,9 +5,6 @@ import matplotlib.pyplot as plt
 def euler_step(stepsize,x_n,t_n):
     return x_n + stepsize*x_n, t_n + stepsize
 
-def expression(x,t):
-    return x
-
 def solve_to(x_1,t_1,t_2,stepsize):
     while t_1 < t_2:
         delta_t = t_2 - t_1
