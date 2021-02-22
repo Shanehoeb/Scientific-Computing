@@ -3,14 +3,23 @@ import matplotlib.pyplot as plt
 
 
 
-def euler_step(stepsize,current_approx,x_n,t_n):
-    return x_n + stepsize*current_approx, t_n + stepsize
+def euler_step(stepsize,x_n,t_n):
+    return x_n + stepsize*x_n, t_n + stepsize
 
 def expression(x,t):
     return x
+
+def solve_to(x_1,t_1,t_2,stepsize):
+    while t_1 < t_2:
+        x_1,t_1 = euler_step(stepsize, x_1, t_1)
+    return x_1, t_1
+
+
+
+
 stepsize = 0.125
 x_0 = 1
 t_0 = 0
 
-a = euler_step(stepsize,expression(x_0,t_0),x_0,t_0)
+a = solve_to(x_0,t_0,1,stepsize)
 print(a)
