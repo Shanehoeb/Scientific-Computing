@@ -1,3 +1,7 @@
+import numpy as np
+from solve_to import solve_to
+
+
 def solve_ode(x_0,t_0,t_array,stepsize, deltat_max,func):
     #generates a series of numerical solution estimates x_1, x_2, x_3...
     # Input : x_0,t_0 initial conditions, array of times at which to approximate t_array,
