@@ -5,6 +5,7 @@ def solve_to(x_1,t_1,t_2,stepsize,deltat_max,func):
     # Input : x_1,t_1 pair of coordinates, t_2 time at which we want to approximate,
     #         stepsize of the euler step and the maximum difference between 
     #         input and output time deltat_max
+    # Output : updated coordinate pair
     if t_2 - t_1 < deltat_max:
         while t_1 < t_2:
             delta_t = t_2 - t_1
