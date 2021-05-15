@@ -3,16 +3,16 @@ import matplotlib.pyplot as plt
 from solve_ode import solve_ode
 
 #Params
-stepsize_list = np.logspace(-8,-1,21,dtype='float64')
+stepsize_list = np.logspace(-8, -1, 21, dtype='float64')
     
 x_0 = 1
 t_0 = 0
-t_array = np.linspace(0,1,21,dtype='float64')
+t_array = np.linspace(0, 1, 21, dtype='float64')
 
 deltat_max = 2
 
 error_list = []
-method = 'euler'
+method = 'rk4'
 
 def func(x,t):
     return x
@@ -20,7 +20,7 @@ def func(x,t):
 if __name__ == '__main__':
 
     for stepsize in stepsize_list:
-        sol = solve_ode(x_0,t_0,t_array,stepsize,deltat_max,func,method)
+        sol = solve_ode(x_0, t_0, t_array, stepsize, deltat_max, func, method)
         error = np.absolute(np.exp(1)-sol[1][-1])
         error_list.append(error)
         
