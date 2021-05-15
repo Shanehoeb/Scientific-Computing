@@ -17,15 +17,15 @@ error_list_euler = []
 stepsize = np.longdouble(0.125)
 
 def f_shm(X, t):
-        x, v = X
-        dxdt = v
-        dvdt = -x
-        dXdt = np.array([dxdt, dvdt])
-        return dXdt
+    x, v = X
+    dxdt = v
+    dvdt = -x
+    dXdt = np.array([dxdt, dvdt])
+    return dXdt
 
 
 method = 'rk4'
-t_span = (0,10)
+t_span = (0, 10)
 # X_solution is a matrix with 200 rows and 2 columns. The first column is
 # x and the other is v.
 
