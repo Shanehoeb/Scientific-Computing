@@ -1,7 +1,15 @@
 import numpy as np
 from scipy.integrate import solve_ivp
-from scipy.optimize import root,fsolve
+from scipy.optimize import root
 from math import nan
+import matplotlib.pyplot as plt
+
+def time_simulation(ode,initialu,duration):
+    sol = solve_ivp(ode, (0, duration), initialu)
+    plt.plot(sol.t, sol.y[0, :])
+    plt.plot(sol.t,sol.y[1, :])
+    plt.title("Timeseries")
+    plt.show()
 
 def orbit(ode, initialu, duration):
     sol = solve_ivp(ode, (0, duration), initialu)
