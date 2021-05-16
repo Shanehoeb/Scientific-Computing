@@ -16,7 +16,7 @@ def pred_prey(t,z,b):
 
 pred_ode = lambda t, u: pred_prey(t, u, 0.25)
 
-pp.time_simulation(pred_ode,(0.8,0.1),500)
+pp.time_simulation(pred_ode, (0.4, 0.4), 100)
 
 #Single out periodic orbit
 (t, u) = pp.orbit(pred_ode, (0.4, 0.4), 5000)
@@ -55,13 +55,13 @@ plt.plot(Vval, Nval, "r-")
 
 
 # Equilibria
-u = pp.equilibrium(pred_ode, (-0.4,-0.4))
+u = pp.equilibrium(pred_ode, (-0.4, -0.4))
 print(u)
 plt.plot(u[0], u[1], "k.")
-u = pp.equilibrium(pred_ode, (1.,0.))
+u = pp.equilibrium(pred_ode, (1., 0.))
 print(u)
 plt.plot(u[0], u[1], "k.")
-u = pp.equilibrium(pred_ode, (-0.2,-0.1))
+u = pp.equilibrium(pred_ode, (-0.2, -0.1))
 print(u)
 plt.plot(u[0], u[1], "k.")
 u = pp.equilibrium(pred_ode, (0.2, 0.2))
