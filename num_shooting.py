@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.integrate import solve_ivp
-from scipy.optimize import root
+from scipy.optimize import root,fsolve
 import matplotlib.pyplot as plt
 from solve_ode import solve_ode
 from math import nan
@@ -33,19 +33,24 @@ plt.plot(u[0, :], u[1, :], "b-")
 (Vval, Nval) = pp.nullcline(pred_ode, (-0.4, 1.1), index=0)
 plt.plot(Vval, Nval, "g-")
 
+
 # N nullcline - this fails
 (Vval, Nval) = pp.nullcline(pred_ode, (-0.4, 1.1), index=1)
-#plt.plot(Vval, Nval, "r-")
-# TODO : fix this nullcline problem
+plt.plot(Vval, Nval, "r-")
 
-#For now hard code nullcline
-x = np.linspace(-0.4,1,101)
-y = np.linspace(-0.4,1,101)
-plt.plot(x,y,"r-")
+
+
+
 
 
 # Equilibria
 u = pp.equilibrium(pred_ode, (-0.4,-0.4))
+print(u)
+plt.plot(u[0], u[1], "k.")
+u = pp.equilibrium(pred_ode, (1.,0.))
+print(u)
+plt.plot(u[0], u[1], "k.")
+u = pp.equilibrium(pred_ode, (-0.2,-0.1))
 print(u)
 plt.plot(u[0], u[1], "k.")
 u = pp.equilibrium(pred_ode, (0.2, 0.2))

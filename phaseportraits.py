@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.integrate import solve_ivp
-from scipy.optimize import root
+from scipy.optimize import root,fsolve
 from math import nan
 
 def orbit(ode, initialu, duration):
@@ -10,13 +10,23 @@ def orbit(ode, initialu, duration):
 def nullcline(ode, u0range, index=0, points=101):
     Vval = np.linspace(min(u0range), max(u0range), points)
     Nval = np.zeros(np.size(Vval))
+    Pval = np.zeros(np.size(Vval))
+    t = 0
     for (i, V) in enumerate(Vval):
-        result = root(lambda N: ode(nan, (V, N))[index], 0)
+        result = root(lambda N: ode(nan, (V, N))[index], [0,5])
         if result.success:
-            Nval[i] = result.x
+            if len(result.x) > 1 :
+                Nval[i] = result.x[0]
+                Pval[i] = result.x[1]
+                t = 1
+            else:
+                Nval[i] = result.x[0]
         else:
             Nval[i] = nan
-    return (Vval, Nval)
+    if t == 1:
+        return (Vval, np.column_stack((Nval,Pval)))
+    else:
+        return (Vval, Nval)
 
 def equilibrium(ode, initialu):
     result = root(lambda u: ode(nan, u), initialu)
