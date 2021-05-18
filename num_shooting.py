@@ -1,12 +1,9 @@
 import numpy as np
-from scipy.integrate import solve_ivp
-from scipy.optimize import root,fsolve
 import matplotlib.pyplot as plt
-from solve_ode import solve_ode
-from math import nan
 import phaseportraits as pp
 
-def pred_prey(t,z,b):
+
+def pred_prey(t, z, b):
     x, y = z
     a = 1.
     d = 0.1
@@ -14,17 +11,15 @@ def pred_prey(t,z,b):
     dydt = b*y*(1 - (y/x))
     return np.array((dxdt, dydt))
 
+
 pred_ode = lambda t, u: pred_prey(t, u, 0.25)
 
-pp.time_simulation(pred_ode, (0.4, 0.4), 100)
-
-#Single out periodic orbit
-(t, u) = pp.orbit(pred_ode, (0.4, 0.4), 5000)
+pp.time_simulation(pred_ode, (0.32, 0.32), 100)
+# Single out periodic orbit
+(t, u) = pp.orbit(pred_ode, (0.32, 0.32), 100)
 plt.plot(u[0, :], u[1, :], "b-")
 plt.title("Periodic Orbit")
 plt.show()
-
-
 
 
 # Some orbits
@@ -40,21 +35,16 @@ plt.plot(u[0, :], u[1, :], "b-")
 plt.plot(u[0, :], u[1, :], "b-")
 
 
-# V nullcline
+# V null-cline
 (Vval, Nval) = pp.nullcline(pred_ode, (-0.4, 1.1), index=0)
 plt.plot(Vval, Nval, "g-")
 
 
-# N nullcline - this fails
+# N null-cline - this fails
 (Vval, Nval) = pp.nullcline(pred_ode, (-0.4, 1.1), index=1)
 plt.plot(Vval, Nval, "r-")
 
-
-
-
-
-
-# Equilibria
+# Equilibrium
 u = pp.equilibrium(pred_ode, (-0.4, -0.4))
 print(u)
 plt.plot(u[0], u[1], "k.")
@@ -69,3 +59,5 @@ plt.plot(u[0], u[1], "k.")
 print(u)
 plt.title("Nullclines & Equilibria")
 plt.show()
+
+# TODO : Numerical Shooting & Extension to all ODEs

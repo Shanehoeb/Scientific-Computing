@@ -4,16 +4,19 @@ from scipy.optimize import root
 from math import nan
 import matplotlib.pyplot as plt
 
-def time_simulation(ode,initialu,duration):
+
+def time_simulation(ode, initialu, duration):
     sol = solve_ivp(ode, (0, duration), initialu)
     plt.plot(sol.t, sol.y[0, :])
     plt.plot(sol.t,sol.y[1, :])
     plt.title("Timeseries")
     plt.show()
 
+
 def orbit(ode, initialu, duration):
     sol = solve_ivp(ode, (0, duration), initialu)
     return (sol.t, sol.y)
+
 
 def nullcline(ode, u0range, index=0, points=101):
     Vval = np.linspace(min(u0range), max(u0range), points)
@@ -21,9 +24,9 @@ def nullcline(ode, u0range, index=0, points=101):
     Pval = np.zeros(np.size(Vval))
     t = 0
     for (i, V) in enumerate(Vval):
-        result = root(lambda N: ode(nan, (V, N))[index], [0,5])
+        result = root(lambda N: ode(nan, (V, N))[index], [0, 5])
         if result.success:
-            if len(result.x) > 1 :
+            if len(result.x) > 1:
                 Nval[i] = result.x[0]
                 Pval[i] = result.x[1]
                 t = 1
@@ -35,6 +38,7 @@ def nullcline(ode, u0range, index=0, points=101):
         return (Vval, np.column_stack((Nval,Pval)))
     else:
         return (Vval, Nval)
+
 
 def equilibrium(ode, initialu):
     result = root(lambda u: ode(nan, u), initialu)

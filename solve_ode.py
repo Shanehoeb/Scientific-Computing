@@ -19,10 +19,6 @@ def solve_ode(func, t_span, x_0, stepsize, method, deltat_max):
     for timestamp in t_array:
         x_value = solve_to(x_0, t_0, timestamp, stepsize, deltat_max, func, method)
         x_0, t_0 = x_value
-        x_list.append(x_value[0][0])
-        y_list.append(x_value[0][1])
-        if timestamp == 1:
-            #print(x_value[0][0],x_value[0][1])
-            pass
+        x_list.append(x_value[0])
     return t_array, x_list, y_list
 

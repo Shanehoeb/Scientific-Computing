@@ -16,6 +16,7 @@ error_list_rk4 = []
 error_list_euler = []
 stepsize = np.longdouble(0.125)
 
+
 def f_shm(X, t):
     x, v = X
     dxdt = v
@@ -37,7 +38,7 @@ v_solution = []
 for i in range(0,len(X_solution[1])-1,2):
     x_solution = np.append(x_solution,X_solution[1][i])
     v_solution = np.append(v_solution,X_solution[1][i+1])
-
+print(x_solution)
  # Create a figure with two plotting axes side by side:
 fig = plt.figure(figsize=(6, 3))
 ax1 = fig.add_axes([0.58, 0.15, 0.35, 0.7])
