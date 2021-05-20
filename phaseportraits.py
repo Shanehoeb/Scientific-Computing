@@ -59,7 +59,6 @@ def orbit(ode, initialu, duration,solver, method="rk4", stepsize=0.005, deltat_m
 def nullcline(ode, u0range, index=0, points=101):
     Vval = np.linspace(min(u0range), max(u0range), points)
     Nval = np.zeros((len(Vval), len(u0range)))
-    t = 0
     for (i, V) in enumerate(Vval):
         result = root(lambda N: ode(nan, (V, N))[index], np.array([min(u0range), max(u0range)]))
         if result.success:

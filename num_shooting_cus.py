@@ -32,20 +32,30 @@ plt.plot(u[0], u[1], "b-")
 plt.plot(u[0], u[1], "y-")
 
 
-
-plt.title("Multiple Orbits")
-plt.show()
-
-
-
 # V null-cline
-(Vval, Nval) = pp.nullcline1(pred_ode, (-0.4, 1.1), index=0)
-plt.plot(Vval, Nval, "p-")
+(Vval, Nval) = pp.nullcline(pred_ode, (-0.4, 1.1), index=0)
+plt.plot(Vval, Nval, "r-")
 
 
 # N null-cline - this fails
-(Vval, Nval) = pp.nullcline1(pred_ode, (-0.4, 1.1), index=1)
-plt.plot(Vval, Nval, "p-")
+(Vval, Nval) = pp.nullcline(pred_ode, (-0.4, 1.1), index=1)
+plt.plot(Vval, Nval, "g-")
+
+
+# Equilibrium
+u = pp.equilibrium(pred_ode, (-0.4, -0.4))
+print(u)
+plt.plot(u[0], u[1], "k.")
+u = pp.equilibrium(pred_ode, (1., 0.))
+print(u)
+plt.plot(u[0], u[1], "k.")
+u = pp.equilibrium(pred_ode, (-0.2, -0.1))
+print(u)
+plt.plot(u[0], u[1], "k.")
+u = pp.equilibrium(pred_ode, (0.2, 0.2))
+plt.plot(u[0], u[1], "k.")
+print(u)
+plt.title("Multiple Orbits, Null-clines & Equilibria")
 plt.show()
 
 
