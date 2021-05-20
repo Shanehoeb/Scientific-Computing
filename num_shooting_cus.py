@@ -16,7 +16,7 @@ pred_ode = lambda t, u: pred_prey(t, u, 0.25)
 pp.time_simulation(pred_ode, (0.32, 0.32), 100, "custom", plot=True)
 
 # Single out periodic orbit
-(t, u) = pp.orbit(pred_ode, (0.32, 0.32), 100, solver="custom")
+(t, u) = pp.orbit(pred_ode, (0.32, 0.32), 100, solver="custom", plot=True)
 
 
 # Some orbits
@@ -30,6 +30,22 @@ plt.plot(u[0], u[1], "k-")
 plt.plot(u[0], u[1], "b-")
 (t, u) = pp.orbit(pred_ode, (0.3, 1.0), 100, solver="custom")
 plt.plot(u[0], u[1], "y-")
+
+
+
+plt.title("Multiple Orbits")
+plt.show()
+
+
+
+# V null-cline
+(Vval, Nval) = pp.nullcline1(pred_ode, (-0.4, 1.1), index=0)
+plt.plot(Vval, Nval, "p-")
+
+
+# N null-cline - this fails
+(Vval, Nval) = pp.nullcline1(pred_ode, (-0.4, 1.1), index=1)
+plt.plot(Vval, Nval, "p-")
 plt.show()
 
 

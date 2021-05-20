@@ -1,9 +1,9 @@
-import numpy as np
 from scipy.integrate import solve_ivp
 from scipy.optimize import root
 from math import nan
 import matplotlib.pyplot as plt
 from solve_ode import*
+import numpy as np
 
 
 def scipy_solver(ode, initialu, duration, plot):
@@ -11,7 +11,7 @@ def scipy_solver(ode, initialu, duration, plot):
     if plot:
         for i in range(len(sol.y)):
             plt.plot(sol.t, sol.y[i, :])
-        plt.title("Time Series Simulation")
+        plt.title("Time Series Simulation for initial conditions %d" % initialu)
         plt.show()
     return sol.t, sol.y
 
@@ -26,7 +26,7 @@ def my_solver(ode, initialu, duration, stepsize, method, deltat_max, plot):
         if plot:
             plt.plot(t_array, sol[:, i])
     if plot:
-        plt.title("Time Series Simulation")
+        plt.title("Time Series Simulation for initial conditions %s" % (initialu,))
         plt.show()
 
     return t_array, solution
@@ -36,7 +36,7 @@ def time_simulation(ode, initialu, duration, solver, method="rk4", stepsize=0.00
     if solver == "scipy":
         return scipy_solver(ode, initialu, duration, plot)
     elif solver == "custom":
-        return my_solver(ode, initialu, duration,stepsize, method, deltat_max, plot)
+        return my_solver(ode, initialu, duration, stepsize, method, deltat_max, plot)
 
 
 def orbit(ode, initialu, duration,solver, method="rk4", stepsize=0.005, deltat_max=2, plot=False):
@@ -51,30 +51,21 @@ def orbit(ode, initialu, duration,solver, method="rk4", stepsize=0.005, deltat_m
         _, sol = my_solver(ode, initialu, duration, stepsize, method, deltat_max, plot=False)
         if plot:
             plt.plot(sol[0], sol[1], "b-")
-            plt.title("Periodic Orbit")
+            plt.title("Periodic Orbit  for initial conditions %s" % (initialu,))
             plt.show()
         return _, sol
 
 
 def nullcline(ode, u0range, index=0, points=101):
-    # TODO : Extend to more than 2D get rid of pval
     Vval = np.linspace(min(u0range), max(u0range), points)
-    Nval = np.zeros(np.size(Vval))
-    Pval = np.zeros(np.size(Vval))
+    Nval = np.zeros((len(Vval), len(u0range)))
     t = 0
     for (i, V) in enumerate(Vval):
-        result = root(lambda N: ode(nan, (V, N))[index], [0, 5])
+        result = root(lambda N: ode(nan, (V, N))[index], np.array([min(u0range), max(u0range)]))
         if result.success:
-            if len(result.x) > 1:
-                Nval[i] = result.x[0]
-                Pval[i] = result.x[1]
-                t = 1
-            else:
-                Nval[i] = result.x[0]
+            Nval[i] = result.x
         else:
             Nval[i] = nan
-    if t == 1:
-        return (Vval, np.column_stack((Nval,Pval)))
     else:
         return (Vval, Nval)
 
