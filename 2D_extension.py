@@ -17,7 +17,7 @@ error_list_euler = []
 stepsize = np.longdouble(0.125)
 
 
-def f_shm(X, t):
+def f_shm(t,X):
     x, v = X
     dxdt = v
     dvdt = -x
@@ -31,14 +31,14 @@ t_span = (0, 10)
 # x and the other is v.
 
 X_solution = solve_ode(f_shm, t_span, X0, stepsize,  method, deltat_max)
-
+print(X_solution[1])
 x_solution = []
 v_solution = []
 
-for i in range(0,len(X_solution[1])-1,2):
-    x_solution = np.append(x_solution,X_solution[1][i])
-    v_solution = np.append(v_solution,X_solution[1][i+1])
-print(x_solution)
+for array in X_solution[1]:
+    x_solution.append(array[0])
+    v_solution.append(array[1])
+
  # Create a figure with two plotting axes side by side:
 fig = plt.figure(figsize=(6, 3))
 ax1 = fig.add_axes([0.58, 0.15, 0.35, 0.7])

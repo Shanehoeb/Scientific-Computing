@@ -1,3 +1,4 @@
+import numpy as np
 def rk4_step(stepsize, func, X, t):
      #Performs a single 4th order Runge-Kutta step for a value of x, t and a stepsize
     # Input : x_n,t_n pair of coordinates, stepsize,func the ODE

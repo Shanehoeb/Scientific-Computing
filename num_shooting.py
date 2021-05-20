@@ -61,3 +61,7 @@ plt.title("Nullclines & Equilibria")
 plt.show()
 
 # TODO : Numerical Shooting & Extension to all ODEs
+
+# Num Shooting :
+# Solve u_0 - f(u_0,T) = 0
+# Define G(u_0) = [u_0 - f(u_o, T) , dx/dt(0) = 0
