@@ -6,33 +6,54 @@ import matplotlib.pyplot as plt
 from solve_ode import*
 
 
+def scipy_solver(ode, initialu, duration, plot):
+    sol = solve_ivp(ode, (0, duration), initialu)
+    if plot:
+        for i in range(len(sol.y)):
+            plt.plot(sol.t, sol.y[i, :])
+        plt.title("Time Series Simulation")
+        plt.show()
+    return sol.t, sol.y
+
+
+def my_solver(ode, initialu, duration, stepsize, method, deltat_max, plot):
+    t_array, sol = solve_ode(ode, (0, duration), initialu, stepsize, method, deltat_max)
+    sol = np.array(sol)
+    solution = []
+    for i in range(len(sol[0])):
+        solution.append(sol[:, i])
+
+        if plot:
+            plt.plot(t_array, sol[:, i])
+    if plot:
+        plt.title("Time Series Simulation")
+        plt.show()
+
+    return t_array, solution
+
+
 def time_simulation(ode, initialu, duration, solver, method="rk4", stepsize=0.005, deltat_max=2, plot=True):
     if solver == "scipy":
-        sol = solve_ivp(ode, (0, duration), initialu)
-        if plot:
-            for i in range(len(sol.y)):
-                plt.plot(sol.t, sol.y[i, :])
-            plt.title("Timeseries")
-            plt.show()
-        return sol.t, sol.y
+        return scipy_solver(ode, initialu, duration, plot)
     elif solver == "custom":
-        t_array, sol = solve_ode(ode, (0, duration), initialu, stepsize, method, deltat_max)
-        sol = np.array(sol)
+        return my_solver(ode, initialu, duration,stepsize, method, deltat_max, plot)
+
+
+def orbit(ode, initialu, duration,solver, method="rk4", stepsize=0.005, deltat_max=2, plot=False):
+    if solver == "scipy":
+        _, sol = scipy_solver(ode, initialu, duration, solver)
         if plot:
-            for i in range(len(sol[0])):
-                plt.plot(t_array, sol[:, i])
-        plt.title("Timeseries")
-        plt.show()
-        # TODO : Change so that sol is an array of dimensions D arrays where each array is solution to one variable
-        # Probably use format for plotting, transpose and append
-        return t_array, sol
-
-
-
-def orbit(ode, initialu, duration):
-    # TODO : Option for custom solver
-    sol = solve_ivp(ode, (0, duration), initialu)
-    return (sol.t, sol.y)
+            plt.plot(sol[0], sol[1], "b-")
+            plt.title("Periodic Orbit")
+            plt.show()
+        return _, sol
+    elif solver == "custom":
+        _, sol = my_solver(ode, initialu, duration, stepsize, method, deltat_max, plot=False)
+        if plot:
+            plt.plot(sol[0], sol[1], "b-")
+            plt.title("Periodic Orbit")
+            plt.show()
+        return _, sol
 
 
 def nullcline(ode, u0range, index=0, points=101):

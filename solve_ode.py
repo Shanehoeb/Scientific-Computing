@@ -12,7 +12,10 @@ def solve_ode(func, t_span, x_0, stepsize, method, deltat_max=2):
     # -method : 4th order Runge-Kutta or Euler
     # deltat_max : maximum step in time
     x_list = []
-    t_array = np.linspace(t_span[0], t_span[1], 201)
+    solve_points = 201
+    if t_span[1] > 200:
+        solve_points = round(t_span[1]+1)
+    t_array = np.linspace(t_span[0], t_span[1], solve_points)
     t_0 = t_span[0]
     #
     for timestamp in t_array:
