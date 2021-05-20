@@ -14,7 +14,7 @@ def pred_prey(t, z, b):
 
 pred_ode = lambda t, u: pred_prey(t, u, 0.25)
 
-pp.time_simulation(pred_ode, (0.32, 0.32), 100)
+pp.time_simulation(pred_ode, (0.32, 0.32), 100, "solve_ivp")
 # Single out periodic orbit
 (t, u) = pp.orbit(pred_ode, (0.32, 0.32), 100)
 plt.plot(u[0, :], u[1, :], "b-")

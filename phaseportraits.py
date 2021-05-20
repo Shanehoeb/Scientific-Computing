@@ -3,14 +3,24 @@ from scipy.integrate import solve_ivp
 from scipy.optimize import root
 from math import nan
 import matplotlib.pyplot as plt
+from solve_ode import*
 
 
-def time_simulation(ode, initialu, duration):
-    sol = solve_ivp(ode, (0, duration), initialu)
-    plt.plot(sol.t, sol.y[0, :])
-    plt.plot(sol.t,sol.y[1, :])
-    plt.title("Timeseries")
-    plt.show()
+def time_simulation(ode, initialu, duration,method):
+    if method == "solve_ivp":
+        sol = solve_ivp(ode, (0, duration), initialu)
+        plt.plot(sol.t, sol.y[0, :])
+        plt.plot(sol.t,sol.y[1, :])
+        plt.title("Timeseries")
+        plt.show()
+    elif method == "custom":
+        t_array, sol = solve_ode(ode, (0, duration), initialu, 0.125, "rk4", deltat_max=2)
+        print(sol)
+        plt.plot(t_array, np.array(sol)[:, 0])
+        plt.plot(t_array, np.array(sol)[:, 1])
+        plt.title("Timeseries")
+        plt.show()
+
 
 
 def orbit(ode, initialu, duration):
