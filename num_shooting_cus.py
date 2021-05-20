@@ -11,6 +11,7 @@ def pred_prey(t, z, b):
     dydt = b*y*(1 - (y/x))
     return np.array((dxdt, dydt))
 
+
 pred_ode = lambda t, u: pred_prey(t, u, 0.25)
 
-pp.time_simulation(pred_ode, (0.32, 0.32), 100, "custom")
+print(pp.time_simulation(pred_ode, (0.32, 0.32), 100, "scipy", plot=False))
