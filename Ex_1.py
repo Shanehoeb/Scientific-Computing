@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from solve_ode import solve_ode
+from numerical_methods import*
 import time
 
 

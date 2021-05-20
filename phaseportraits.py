@@ -2,7 +2,7 @@ from scipy.integrate import solve_ivp
 from scipy.optimize import root
 from math import nan
 import matplotlib.pyplot as plt
-from solve_ode import*
+from numerical_methods import*
 import numpy as np
 
 
@@ -16,7 +16,7 @@ def scipy_solver(ode, initialu, duration, plot):
     return sol.t, sol.y
 
 
-def my_solver(ode, initialu, duration, stepsize, method, deltat_max, plot):
+def my_solver(ode, initialu, duration, stepsize=0.005, method="rk4", deltat_max=2, plot=True):
     t_array, sol = solve_ode(ode, (0, duration), initialu, stepsize, method, deltat_max)
     sol = np.array(sol)
     solution = []
@@ -76,3 +76,18 @@ def equilibrium(ode, initialu):
     else:
         return nan
     # TODO: Should I throw an error here instead?
+
+
+def num_shoot(ode, func, initialu, t):
+    step = 0
+    # TODO : Numerical Shooting & Extension to all ODEs
+    der = (func(t+step, initialu) - func(t, initialu))/ (t + step)
+    result = root((der, func(t, initialu)), t)
+    if result.success:
+        return result.x
+    else:
+        return nan
+    pass
+# Num Shooting :
+# Solve u_0 - f(u_0,T) = 0
+# Define G(u_0) = [u_0 - f(u_o, T) , dx/dt(0)] = 0

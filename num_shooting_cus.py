@@ -57,6 +57,3 @@ plt.plot(u[0], u[1], "k.")
 print(u)
 plt.title("Multiple Orbits, Null-clines & Equilibria")
 plt.show()
-
-
-
