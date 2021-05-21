@@ -5,7 +5,7 @@ def rk4_step(stepsize, func, X, t):
     # Performs a single 4th order Runge-Kutta step for a value of x, t and a stepsize
     # Input : x_n,t_n pair of coordinates, stepsize,func the ODE
     # Output : Updated pair of values after Runge-Kutta step of stepsize
-    X = np.array(X)
+    X = np.array(X, dtype='float64')
     k_1 = func(t, X)
     k_2 = func(t + stepsize * 1 / 2, X + stepsize * k_1 * 1 / 2)
     k_3 = func(t + stepsize * 1 / 2, X + stepsize * k_2 * 1 / 2)
@@ -14,7 +14,7 @@ def rk4_step(stepsize, func, X, t):
 
 
 def euler_step(stepsize, func, X, t):
-    X = np.array(X)
+    X = np.array(X, dtype='float64')
     #Performs a single euler step for a value of x, t and a stepsize
     # Input : x_n,t_n pair of coordinates, stepsize,func the ODE
     # Output : Updated pair of values after euler step of stepsize

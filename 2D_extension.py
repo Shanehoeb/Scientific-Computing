@@ -28,9 +28,9 @@ t_span = (0, 100)
 # X_solution is a matrix with 200 rows and 2 columns. The first column is
 # x and the other is v.
 
-_, X_solution = my_solver(f_shm, X0, 100)
+_, X_solution = my_solver(f_shm, X0, (0,100))
 # Single out periodic orbit
-(t, u) = orbit(f_shm, (0.32, 0.32), 100, solver="custom", plot=True)
+(t, u) = orbit(f_shm, (0.32, 0.32), (0,100), solver="custom", plot=True)
 
 
 

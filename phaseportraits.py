@@ -1,23 +1,23 @@
 from scipy.integrate import solve_ivp
-from scipy.optimize import root
+from scipy.optimize import root, fsolve
 from math import nan
 import matplotlib.pyplot as plt
 from numerical_methods import*
 import numpy as np
 
 
-def scipy_solver(ode, initialu, duration, plot):
-    sol = solve_ivp(ode, (0, duration), initialu)
+def scipy_solver(ode, initialu, t_span, plot=False):
+    sol = solve_ivp(ode, t_span, initialu)
     if plot:
         for i in range(len(sol.y)):
             plt.plot(sol.t, sol.y[i, :])
-        plt.title("Time Series Simulation for initial conditions %d" % initialu)
+        plt.title("Time Series Simulation for initial conditions %s" % str(initialu))
         plt.show()
     return sol.t, sol.y
 
 
-def my_solver(ode, initialu, duration, stepsize=0.005, method="rk4", deltat_max=2, plot=True):
-    t_array, sol = solve_ode(ode, (0, duration), initialu, stepsize, method, deltat_max)
+def my_solver(ode, initialu, t_span, stepsize=0.005, method="rk4", deltat_max=2, plot=True):
+    t_array, sol = solve_ode(ode, t_span, initialu, stepsize, method, deltat_max)
     sol = np.array(sol)
     solution = []
     for i in range(len(sol[0])):
@@ -78,16 +78,22 @@ def equilibrium(ode, initialu):
     # TODO: Should I throw an error here instead?
 
 
-def num_shoot(ode, func, initialu, t):
-    step = 0
-    # TODO : Numerical Shooting & Extension to all ODEs
-    der = (func(t+step, initialu) - func(t, initialu))/ (t + step)
-    result = root((der, func(t, initialu)), t)
-    if result.success:
-        return result.x
-    else:
-        return nan
+def num_shot_bvp(equations, initial_guess, t_span, solver, index):
+    # TODO : This function should return the numerical result for the boundary value we are looking for from given guess
+    # Will serve as the low-level in our solving
+    if solver == "scipy":
+        sol = scipy_solver(equations, initial_guess, t_span, solver)
+        val = sol[index][-1]
+        return val
+    if solver == "custom":
+        pass
+
+def numeric_shooting():
+    # From Orbit Function !!
+    # TODO : this function will iterate until it finds initial condition satisfying our boundary conditions
+    # Change guess with Newton iteration for roots
     pass
-# Num Shooting :
-# Solve u_0 - f(u_0,T) = 0
-# Define G(u_0) = [u_0 - f(u_o, T) , dx/dt(0)] = 0
+
+
+
+

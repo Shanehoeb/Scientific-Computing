@@ -19,25 +19,22 @@ def func(t, x):
 
 #Timing for similar errors
 start = time.process_time()
-print("i")
 sol = solve_ode(func, (0., 1.), x_0, 0.125, "euler", deltat_max)
-print(time.process_time() - start)
+print("Time for Euler method: %s"%str(time.process_time() - start))
 start = time.process_time()
 sol = solve_ode(func, (0., 1.), x_0, 0.125, "rk4", deltat_max)
-print(time.process_time() - start)
+print("Time for RK4 method: %s"%str(time.process_time() - start))
 
-
+print("Running...")
 for stepsize in stepsize_list:
     sol = solve_ode(func, (0., 1.), x_0, stepsize, "euler", deltat_max)
     error = np.absolute(np.exp(1)-sol[1][-1])
     error_list_euler.append(error)
-    print(sol[1][-1])
 
 for stepsize in stepsize_list:
     sol = solve_ode(func, (0., 1.), x_0, stepsize, "rk4", deltat_max)
     error = np.absolute(np.exp(1)-sol[1][-1])
     error_list_rk.append(error)
-    print(sol[1][-1])
 
 
 fig = plt.figure()
