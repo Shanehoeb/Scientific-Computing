@@ -32,7 +32,7 @@ def my_solver(ode, initialu, t_span, stepsize=0.005, method="rk4", deltat_max=2,
     return t_array, solution
 
 
-def time_simulation(ode, initialu, duration, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, plot=True):
+def time_simulation(ode, initialu, duration, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, plot=False):
     if solver == "scipy":
         return scipy_solver(ode, initialu, duration, plot)
     elif solver == "custom":
@@ -88,6 +88,13 @@ def num_shot_bvp(equations, initial_guess, t_span, solver, index):
     if solver == "custom":
         pass
 
+def secant(x, y, error):
+    z1, z2 = x
+    w1, w2 = y
+    z1 = z2
+    z2 = z2 + (z2 - z1) / (w2 - w1) * error
+    return (z1, z2), w2
+
 
 def shoot_bvp(f, u, guess, t_span, tol=0.01, solver="custom", points=101):
     #Solve boundary value problems with numerical shooting
@@ -102,9 +109,28 @@ def shoot_bvp(f, u, guess, t_span, tol=0.01, solver="custom", points=101):
     # - other parameters for custom
     # OUTPUT :
     # sol : array of solutions of bvp for t_span
+    max_iteration = 100
+    t_array = np.linspace(t_span[0], t_span[1], points)
+
+    sol1 = time_simulation(f, np.array((u[0], guess[0])), t_span, solver=solver)
+    val1 = sol1[1][-1][0]
+    error1 = val1 - u[1]
+    print(error1)
+    for i in range(max_iteration):
+        sol2 = time_simulation(f, np.array((u[0], guess[1])), t_span, solver=solver)
+        val2 = sol2[1][-1][0]
+        error2 = val2 - u[1]
+        print(error2)
+        if np.absolute(error2) < tol:
+            print("Success!")
+            break
+        guess, val2 = secant(u, guess, error2)
+        print(guess)
 
 
 
+
+    print("Didnt converge")
     pass
 
 

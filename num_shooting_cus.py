@@ -65,3 +65,13 @@ blue_patch = mpatches.Patch(color='blue', label='Nullclines')
 plt.legend(handles=[red_patch, blue_patch])
 plt.show()
 
+def bvp(t, z):
+    x, y = z
+    dxdt = y
+    dydt = (-0.5*x) + (5/2)*y
+    return np.array((dxdt, dydt))
+u = np.array((6.,-1.))
+t_span = (-5., 3.)
+guess = np.array((0., 3.))
+f = lambda t, u: bvp(t,u)
+pp.shoot_bvp(f, u, guess, t_span)
