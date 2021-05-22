@@ -32,7 +32,7 @@ def my_solver(ode, initialu, t_span, stepsize=0.005, method="rk4", deltat_max=2,
     return t_array, solution
 
 
-def time_simulation(ode, initialu, duration, solver, method="rk4", stepsize=0.005, deltat_max=2, plot=True):
+def time_simulation(ode, initialu, duration, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, plot=True):
     if solver == "scipy":
         return scipy_solver(ode, initialu, duration, plot)
     elif solver == "custom":
@@ -88,12 +88,27 @@ def num_shot_bvp(equations, initial_guess, t_span, solver, index):
     if solver == "custom":
         pass
 
-def numeric_shooting():
-    # From Orbit Function !!
-    # TODO : this function will iterate until it finds initial condition satisfying our boundary conditions
-    # Change guess with Newton iteration for roots
+
+def shoot_bvp(f, u, guess, t_span, tol=0.01, solver="custom", points=101):
+    #Solve boundary value problems with numerical shooting
+    # INPUTS :
+    # - f : function dy/dt = f(t,y). The function is transformed to first order system,
+    #       returns array of size number of variables in the system.
+    # - u : Array of Solutions at the right and left of the boundary
+    # - guess : initial guess provided by user
+    # - solver : custom or scipy
+    # - t_span : tuple containing limits of time period
+    # - points : nb of points to generate
+    # - other parameters for custom
+    # OUTPUT :
+    # sol : array of solutions of bvp for t_span
+
+
+
     pass
 
 
 
-
+# From Orbit Function !!
+    # TODO : this function will iterate until it finds initial condition satisfying our boundary conditions
+    # Change guess with Newton iteration for roots
