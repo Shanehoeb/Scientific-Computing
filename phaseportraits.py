@@ -96,7 +96,7 @@ def secant(x, y, error):
     return (z1, z2), w2
 
 
-def shoot_bvp(f, u, guess, t_span, tol=0.01, solver="custom", points=101):
+def shoot_bvp(f, u, guess, t_span, tol=0.01, solver="custom"):
     #Solve boundary value problems with numerical shooting
     # INPUTS :
     # - f : function dy/dt = f(t,y). The function is transformed to first order system,
@@ -110,12 +110,11 @@ def shoot_bvp(f, u, guess, t_span, tol=0.01, solver="custom", points=101):
     # OUTPUT :
     # sol : array of solutions of bvp for t_span
     max_iteration = 100
-    t_array = np.linspace(t_span[0], t_span[1], points)
+    success = False
 
     sol1 = time_simulation(f, np.array((u[0], guess[0])), t_span, solver=solver)
     val1 = sol1[1][-1][0]
     error1 = val1 - u[1]
-    print(error1)
     for i in range(max_iteration):
         sol2 = time_simulation(f, np.array((u[0], guess[1])), t_span, solver=solver)
         val2 = sol2[1][-1][0]
@@ -123,15 +122,15 @@ def shoot_bvp(f, u, guess, t_span, tol=0.01, solver="custom", points=101):
         print(error2)
         if np.absolute(error2) < tol:
             print("Success!")
+            success = True
             break
         guess, val2 = secant(u, guess, error2)
-        print(guess)
+    if success == False:
+        print("Didnt converge")
+        return nan
+    else:
+        return sol2
 
-
-
-
-    print("Didnt converge")
-    pass
 
 
 

@@ -71,7 +71,7 @@ def bvp(t, z):
     dydt = (-0.5*x) + (5/2)*y
     return np.array((dxdt, dydt))
 u = np.array((6.,-1.))
-t_span = (-5., 3.)
+t_span = (0., 3.)
 guess = np.array((0., 3.))
-f = lambda t, u: bvp(t,u)
+f = lambda t, u: bvp(t, u)
 pp.shoot_bvp(f, u, guess, t_span)
