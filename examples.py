@@ -19,9 +19,10 @@ def pred_prey(t, z, p):
 
 pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
 
-print(ns.phase_condition(pred_ode, (0.5,0.5), index=0))
-
-ns.vector_eq((np.array((0.5,0.5)), 18), pred_ode, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, index=0)
 
 
+print(ns.vector_eq((np.array((0.5,0.5)), 18), pred_ode, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, index=0))
 
+
+
+print(ns.shoot(np.array([0.5,0.5, 18]), pred_ode))

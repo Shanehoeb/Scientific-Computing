@@ -1,5 +1,6 @@
 import phaseportraits as pp
 import numpy as np
+from scipy.optimize import fsolve
 
 
 def phase_condition(ode, initialu, index=0):
@@ -24,7 +25,7 @@ def phase_condition(ode, initialu, index=0):
 
        Value of the derivative at time t = 0.
        """
-    sol = ode(0, initialu)[index]
+    sol = np.array([ode(0, initialu)[index]])
     return sol
 
 
@@ -64,7 +65,8 @@ def vector_eq(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, de
 
        Returns
        ---------
-       Necessary equation to find limit cycle of ODEs. Numpy array.
+       Necessary equation to find limit cycle of ODEs. Numpy array at [0]
+       Float at [1]
                     """
     initialu, t_period = init_guess
     phase_cond = phase_condition(ode, initialu, index)
@@ -73,6 +75,10 @@ def vector_eq(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, de
 
     for i in range(len(solution)):
         values.append(solution[i][-1])
-    return initialu - values
+    print((initialu - values)[index])
+    return np.concatenate(((initialu - values), phase_cond))
 
 
+def shoot(init_guess, ode):
+    solution = fsolve(lambda shot, ode: vector_eq(shot, ode), init_guess, ode)
+    print(solution)
