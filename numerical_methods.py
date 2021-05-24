@@ -206,5 +206,5 @@ def solve_ode(func, t_span, X, stepsize, method, deltat_max=2, points=0):
         x_value = solve_to(X, t_0, timestamp, stepsize, deltat_max, func, method)
         X, t_0 = x_value
         # Append solution for time stamp
-        x_list.append(x_value[0])
+        x_list.append(X)
     return t_array, x_list

@@ -1,8 +1,5 @@
 import unittest
 
-import numpy as np
-
-from numerical_methods import*
 from phaseportraits import*
 from examples import*
 pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
@@ -19,7 +16,6 @@ class MyTestCase(unittest.TestCase):
         real = [0.49916696, 0.49999948]
         assert np.isclose(t_new, t + stepsize) and np.allclose(sol, real)
 
-
     def test_rk4(self):
         stepsize = 0.005
         t = 0
@@ -27,9 +23,17 @@ class MyTestCase(unittest.TestCase):
         real = [0.49916696, 0.49999948]
         assert np.isclose(t_new, t + stepsize) and np.allclose(sol, real)
 
-
     def test_solve_to(self):
-        assert "a" == "a"
+        X = (0.5, 0.5)
+        t_1 = 0
+        t_2 = 1
+        stepsize = 0.005
+        real_rk = [0.34428321, 0.47752384]
+        real_eul = [0.3441899, 0.47760635]
+        sol, t = solve_to(X, t_1, t_2, stepsize, deltat_max=2, func=pred_ode, method='rk4')
+        sol1, t1 = solve_to(X, t_1, t_2, stepsize, deltat_max=2, func=pred_ode, method='euler')
+        assert np.isclose(t, t_2) and np.allclose(sol, real_rk) #Test rk4
+        assert np.isclose(t1, t_2) and np.allclose(sol1, real_eul)  # Test euler
 
     def test_solve_ode(self):
         assert "a" == "a"

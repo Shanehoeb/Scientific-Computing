@@ -3,6 +3,7 @@ import phaseportraits as pp
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numerical_methods as nm
+import numerical_shooting as ns
 
 
 def defaults_pred_prey():
