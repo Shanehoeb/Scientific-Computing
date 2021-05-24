@@ -1,7 +1,7 @@
 import unittest
-
 from phaseportraits import*
 from examples import*
+
 pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
 
 
