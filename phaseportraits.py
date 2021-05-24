@@ -38,12 +38,15 @@ def scipy_solver(ode, initialu, t_span, plot=False):
             the time stamps in t_array. Length is same as t_array.
 
     """
+    # Solve using scipy
     sol = solve_ivp(ode, t_span, initialu)
+    # If plot argument is true, plot time simulation of the ODE
     if plot:
         for i in range(len(sol.y)):
             plt.plot(sol.t, sol.y[i, :])
         plt.title("Time Series Simulation for initial conditions %s" % str(initialu))
         plt.show()
+    # Return solution
     return sol.t, sol.y
 
 
@@ -89,12 +92,14 @@ def my_solver(ode, initialu, t_span, stepsize=0.005, method="rk4", deltat_max=2,
     solution : array of numerical solutions of the system of ODEs corresponding to
                the time stamps in t_array. Length is same as t_array.
         """
+    # Solve ODE using custom solver
     t_array, sol = solve_ode(ode, t_span, initialu, stepsize, method, deltat_max)
     sol = np.array(sol)
     solution = []
+    # Reformat to match scipy versiom
     for i in range(len(sol[0])):
         solution.append(sol[:, i])
-
+    # Plot Optional
         if plot:
             plt.plot(t_array, sol[:, i])
     if plot:
@@ -203,13 +208,16 @@ def orbit(ode, initialu, t_span, solver="custom", method="rk4", stepsize=0.005, 
         ---------
         _ : array of equally spaced time stamps between the two time limits in
             t_span. Length of this array depends depends on points parameter.
+
         sol : array of numerical solutions of the system of ODEs corresponding to
-              the time stamps in t_array. Length is same as t_array. Each entry of sol corresponds to the solutions
-              of one of the ODEs in the system
+              the time stamps in t_array. Length is same as t_array. Each entry of sol
+              corresponds to the solutions of one of the ODEs in the system. sol[0]
+              and sol[1] are used to plot orbit.
             """
     if solver == "scipy":
         _, sol = scipy_solver(ode, initialu, t_span, solver)
         if plot:
+            # Plot orbit
             plt.plot(sol[0], sol[1], "b-")
             plt.title("Periodic Orbit")
             plt.show()
@@ -250,8 +258,10 @@ def nullcline(ode, u0range, index=0, points=101):
         ODE.
 
         """
+    # Set one to 0, Calculate other
     Vval = np.linspace(min(u0range), max(u0range), points)
     Nval = np.zeros((len(Vval), len(u0range)))
+    # Iterate and calculate nullcline
     for (i, V) in enumerate(Vval):
         result = root(lambda N: ode(nan, (V, N))[index], np.array([min(u0range), max(u0range)]))
         if result.success:
@@ -281,11 +291,15 @@ def find_equilibria(ode, nb_dim):
      """
     symbols = []
     eqs = []
+    # Create list of symbols
     for i in range(nb_dim):
         r = sm.symbols(str(i))
         symbols.append(r)
+    # Compute ode for symbols
     u = ode(np.nan, symbols)
+    # Solve symbolic expression
     for symbol in u:
         eqs.append(sm.Eq(symbol, 0))
+    # Return equilibria
     equilibria = sm.solve(eqs, symbols)
     return equilibria

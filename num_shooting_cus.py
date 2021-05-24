@@ -4,21 +4,24 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 
-def pred_prey(t, z, b):
+def defaults_pred_prey():
+    return {
+        "a": 1.,
+        "b": 0.25,
+        "d": 0.1
+    }
+def pred_prey(t, z, p):
     x, y = z
-    a = 1.
-    d = 0.1
-    dxdt = x*(1-x) - (a*x*y)/(d+x)
-    dydt = b*y*(1 - (y/x))
+    dxdt = x*(1-x) - (p['a']*x*y)/(p['d']+x)
+    dydt = p['b']*y*(1 - (y/x))
     return np.array((dxdt, dydt))
 
 
-pred_ode = lambda t, u: pred_prey(t, u, 0.25)
+
+pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
 a = pp.time_simulation(pred_ode, (0.32, 0.32), (0, 18.5), "custom", plot=True)
 (t1, u1) = pp.orbit(pred_ode, (0.32, 0.32), (0, 18.5), solver="custom", plot=True)
 
-
-pp.time_simulation(lambda t, u: pred_prey(t, u, 0.27), (0.32, 0.32), (0,100), "custom", plot=True)
 
 # Single out periodic orbit
 (t, u) = pp.orbit(pred_ode, (0.32, 0.32), (0,100), solver="custom", plot=True)
@@ -46,26 +49,6 @@ plt.plot(Vval, Nval, "b-", linewidth=4)
 plt.plot(Vval, Nval, "b-", linewidth=4)
 
 
-# Equilibrium
-u = pp.equilibrium(pred_ode, (-0.4, -0.4))
-
-plt.plot(u[0], u[1], "r.", markersize=20)
-u = pp.equilibrium(pred_ode, (1., 0.))
-
-plt.plot(u[0], u[1], "r.", markersize=20)
-u = pp.equilibrium(pred_ode, (-0.2, -0.1))
-
-plt.plot(u[0], u[1], "r.", markersize=20)
-u = pp.equilibrium(pred_ode, (0.2, 0.2))
-plt.plot(u[0], u[1], "r.", markersize=20)
-
-plt.title("Multiple Orbits, Nullclines & Equilibria")
-red_patch = mpatches.Patch(color='red', label='Equilibria')
-blue_patch = mpatches.Patch(color='blue', label='Nullclines')
-plt.legend(handles=[red_patch, blue_patch])
-plt.show()
-
-
 import sympy as sm
 
 r,c = sm.symbols('r, c')
@@ -76,8 +59,3 @@ CEqual = sm.Eq(C, 0)
 # compute fixed points
 equilibria = sm.solve( (REqual, CEqual), r, c)
 print(equilibria)
-
-
-
-
-find_equilibria(pred_ode,2)
