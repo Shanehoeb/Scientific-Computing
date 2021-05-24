@@ -4,9 +4,40 @@ from math import nan
 import matplotlib.pyplot as plt
 from numerical_methods import*
 import numpy as np
+import sympy as sm
 
 
 def scipy_solver(ode, initialu, t_span, plot=False):
+    """ Uses Scipy' solve_ivp to solve initial value problem for an ODE.
+
+    Parameters
+    ---------
+    ode : callable
+          Callable function of the ODE to solve, in which the ODE is converted to a
+          system of first order differential equations.
+
+    initialu: Array-like of floats, size(D,)
+              Array of length D the number of dimensions of the system containing
+              the initial values at time t for all equations in the system.
+
+    t_span : tuple of floats, size(2,)
+             Tuple containing time limit values defining a time period for which
+             to solve for.
+    plot: bool
+          Boolean value passed by the user; if True, a plot of the calculated
+          solutions of the ODE over the time period will be generated
+
+    Returns
+    ---------
+    Tuple of length 2 containing two Numpy arrays.
+
+    sol.t : array of equally spaced time stamps between the two time limits in
+            t_span. Length of this array depends depends on points parameter.
+
+    sol.y : array of numerical solutions of the system of ODEs corresponding to
+            the time stamps in t_array. Length is same as t_array.
+
+    """
     sol = solve_ivp(ode, t_span, initialu)
     if plot:
         for i in range(len(sol.y)):
@@ -17,6 +48,47 @@ def scipy_solver(ode, initialu, t_span, plot=False):
 
 
 def my_solver(ode, initialu, t_span, stepsize=0.005, method="rk4", deltat_max=2, plot=True):
+    """ Uses custom solver to solve initial value problem for an ODE.
+
+    Parameters
+    ---------
+    ode : callable
+          Callable function of the ODE to solve, in which the ODE is converted to a
+          system of first order differential equations.
+
+    initialu: Array-like of floats, size(D,)
+              Array of length D the number of dimensions of the system containing
+              the initial values at time t for all equations in the system.
+
+    t_span : tuple of floats, size(2,)
+             Tuple containing time limit values defining a time period for which
+             to solve for.
+
+    stepsize : float
+               Determines the size of the time step taken to compute the step for
+               custom solver.
+
+    method : string
+             Desired method to solve the ODE. Options are 4th order Runge-Kutta
+             or Euler. These must be passed as "rk4" or "euler" respectively.
+
+    deltat_max : float
+                 Maximum time difference between two timestamps for solving.
+
+    plot: bool
+          Boolean value passed by the user; if True, a plot of the calculated
+          solutions of the ODE over the time period will be generated.
+
+    Returns
+    ---------
+    Tuple of length 2 containing two Numpy arrays.
+
+    t_array : array of equally spaced time stamps between the two time limits in
+              t_span. Length of this array depends depends on points parameter.
+
+    solution : array of numerical solutions of the system of ODEs corresponding to
+               the time stamps in t_array. Length is same as t_array.
+        """
     t_array, sol = solve_ode(ode, t_span, initialu, stepsize, method, deltat_max)
     sol = np.array(sol)
     solution = []
@@ -32,23 +104,118 @@ def my_solver(ode, initialu, t_span, stepsize=0.005, method="rk4", deltat_max=2,
     return t_array, solution
 
 
-def time_simulation(ode, initialu, duration, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, plot=False):
+def time_simulation(ode, initialu, t_span, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, plot=False):
+    """ Uses Scipy' solve_ivp or a custom solver to solve initial value problem
+        for an ODE over a specified time period.
+
+    Parameters
+    ---------
+    ode : callable
+          Callable function of the ODE to solve, in which the ODE is converted to a
+          system of first order differential equations.
+
+    initialu: Array-like of floats, size(D,)
+              Array of length D the number of dimensions of the system containing
+              the initial values at time t for all equations in the system.
+
+    t_span : tuple of floats, size(2,)
+             Tuple containing time limit values defining a time period for which
+             to solve for.
+
+
+    solver : string, "scipy" or "custom"
+             Choice of solver to use, either scipy's using solve_ivp or custom
+
+
+    method : string
+             Desired method to solve the ODE. Options are 4th order Runge-Kutta
+             or Euler. These must be passed as "rk4" or "euler" respectively.
+             Only for custom solver.
+
+    stepsize : float
+               Determines the size of the time step taken to compute the step for
+               custom solver. Only for custom solver.
+
+    deltat_max : float
+                 Maximum time difference between two timestamps for solving.
+                 Only for custom solver.
+
+    plot: bool
+          Boolean value passed by the user; if True, a plot of the calculated
+          solutions of the ODE over the time period will be generated.
+
+    Returns
+    ---------
+    Tuple of length 2 containing two Numpy arrays.
+
+    t_array : array of equally spaced time stamps between the two time limits in
+              t_span. Length of this array depends depends on points parameter.
+
+    solution : array of numerical solutions of the system of ODEs corresponding to
+               the time stamps in t_array. Length is same as t_array.
+        """
     if solver == "scipy":
-        return scipy_solver(ode, initialu, duration, plot)
+        return scipy_solver(ode, initialu, t_span, plot)
     elif solver == "custom":
-        return my_solver(ode, initialu, duration, stepsize, method, deltat_max, plot)
+        return my_solver(ode, initialu, t_span, stepsize, method, deltat_max, plot)
 
 
-def orbit(ode, initialu, duration,solver, method="rk4", stepsize=0.005, deltat_max=2, plot=False):
+def orbit(ode, initialu, t_span, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, plot=False):
+    """ Compute phase-portrait (orbits) of an initial value problem for an ODE.
+
+        Parameters
+        ---------
+        ode : callable
+              Callable function of the ODE to solve, in which the ODE is converted to a
+              system of first order differential equations.
+
+        initialu: Array-like of floats, size(D,)
+                  Array of length D the number of dimensions of the system containing
+                  the initial values at time t for all equations in the system.
+
+        t_span : tuple of floats, size(2,)
+                 Tuple containing time limit values defining a time period for which
+                 to solve for.
+
+
+        solver : string, "scipy" or "custom"
+                 Choice of solver to use, either scipy's using solve_ivp or custom
+
+
+        method : string
+                 Desired method to solve the ODE. Options are 4th order Runge-Kutta
+                 or Euler. These must be passed as "rk4" or "euler" respectively.
+                 Only for custom solver.
+
+        stepsize : float
+                   Determines the size of the time step taken to compute the step for
+                   custom solver. Only for custom solver.
+
+        deltat_max : float
+                     Maximum time difference between two timestamps for solving.
+                     Only for custom solver.
+
+        plot: bool
+              Boolean value passed by the user; if True, a plot of the calculated
+              solutions of the ODE over the time period will be generated.
+
+        Returns
+        ---------
+        _ : array of equally spaced time stamps between the two time limits in
+            t_span. Length of this array depends depends on points parameter.
+        sol : array of numerical solutions of the system of ODEs corresponding to
+              the time stamps in t_array. Length is same as t_array. Each entry of sol corresponds to the solutions
+              of one of the ODEs in the system
+            """
     if solver == "scipy":
-        _, sol = scipy_solver(ode, initialu, duration, solver)
+        _, sol = scipy_solver(ode, initialu, t_span, solver)
         if plot:
             plt.plot(sol[0], sol[1], "b-")
             plt.title("Periodic Orbit")
             plt.show()
         return _, sol
     elif solver == "custom":
-        _, sol = my_solver(ode, initialu, duration, stepsize, method, deltat_max, plot=False)
+        _, sol = my_solver(ode, initialu, t_span, stepsize, method, deltat_max, plot=False)
         if plot:
             plt.plot(sol[0], sol[1], "b-")
             plt.title("Periodic Orbit  for initial conditions %s" % (initialu,))
@@ -57,6 +224,32 @@ def orbit(ode, initialu, duration,solver, method="rk4", stepsize=0.005, deltat_m
 
 
 def nullcline(ode, u0range, index=0, points=101):
+    """ Returns the nullcline for one of the ODE variables for a specified range
+        of values.
+
+        Parameters
+        ---------
+        ode : callable
+              Callable function of the ODE to solve, in which the ODE is converted to a
+              system of first order differential equations.
+
+        u0range: tuple of floats, size(D,)
+                 Tuple containing the limit values of the range for which the
+                 nullcline is computed.
+
+        index: int
+               Integer representing the variable of interest in the ODE function.
+
+        points: int
+                Number of points to compute the nullcline at. If not accurate enough,
+                increase. Default is 101.
+
+        Returns
+        ---------
+        Tuple of Numpy arrays containing the variable values at the nullcline of the
+        ODE.
+
+        """
     Vval = np.linspace(min(u0range), max(u0range), points)
     Nval = np.zeros((len(Vval), len(u0range)))
     for (i, V) in enumerate(Vval):
@@ -69,71 +262,30 @@ def nullcline(ode, u0range, index=0, points=101):
         return (Vval, Nval)
 
 
-def equilibrium(ode, initialu):
-    result = root(lambda u: ode(nan, u), initialu)
-    if result.success:
-        return result.x
-    else:
-        return nan
-    # TODO: Should I throw an error here instead?
+def find_equilibria(ode, nb_dim):
+    """Uses Sympy library to find all equilibria of a system
 
+       Parameters
+       ---------
+        ode : callable
+              Callable function of the ODE to solve, in which the ODE is converted to a
+              system of first order differential equations.
 
-def num_shot_bvp(equations, initial_guess, t_span, solver, index):
-    # TODO : This function should return the numerical result for the boundary value we are looking for from given guess
-    # Will serve as the low-level in our solving
-    if solver == "scipy":
-        sol = scipy_solver(equations, initial_guess, t_span, solver)
-        val = sol[index][-1]
-        return val
-    if solver == "custom":
-        pass
+        nb_dim : int
+                 Number of dimensions of the ODE (number of first order equations
+                  in system)
 
-def secant(x, y, error):
-    z1, z2 = x
-    w1, w2 = y
-    z1 = z2
-    z2 = z2 + (z2 - z1) / (w2 - w1) * error
-    return (z1, z2), w2
-
-
-def shoot_bvp(f, u, guess, t_span, tol=0.01, solver="custom"):
-    #Solve boundary value problems with numerical shooting
-    # INPUTS :
-    # - f : function dy/dt = f(t,y). The function is transformed to first order system,
-    #       returns array of size number of variables in the system.
-    # - u : Array of Solutions at the right and left of the boundary
-    # - guess : initial guess provided by user
-    # - solver : custom or scipy
-    # - t_span : tuple containing limits of time period
-    # - points : nb of points to generate
-    # - other parameters for custom
-    # OUTPUT :
-    # sol : array of solutions of bvp for t_span
-    max_iteration = 100
-    success = False
-
-    sol1 = time_simulation(f, np.array((u[0], guess[0])), t_span, solver=solver)
-    val1 = sol1[1][-1][0]
-    error1 = val1 - u[1]
-    for i in range(max_iteration):
-        sol2 = time_simulation(f, np.array((u[0], guess[1])), t_span, solver=solver)
-        val2 = sol2[1][-1][0]
-        error2 = val2 - u[1]
-        print(error2)
-        if np.absolute(error2) < tol:
-            print("Success!")
-            success = True
-            break
-        guess, val2 = secant(u, guess, error2)
-    if success == False:
-        print("Didnt converge")
-        return nan
-    else:
-        return sol2
-
-
-
-
-# From Orbit Function !!
-    # TODO : this function will iterate until it finds initial condition satisfying our boundary conditions
-    # Change guess with Newton iteration for roots
+        Returns
+        ---------
+        Array of tuples containing equilibrium coordinates
+     """
+    symbols = []
+    eqs = []
+    for i in range(nb_dim):
+        r = sm.symbols(str(i))
+        symbols.append(r)
+    u = ode(np.nan, symbols)
+    for symbol in u:
+        eqs.append(sm.Eq(symbol, 0))
+    equilibria = sm.solve(eqs, symbols)
+    return equilibria

@@ -65,13 +65,19 @@ blue_patch = mpatches.Patch(color='blue', label='Nullclines')
 plt.legend(handles=[red_patch, blue_patch])
 plt.show()
 
-def bvp(t, z):
-    x, y = z
-    dxdt = y
-    dydt = (-0.5*x) + (5/2)*y
-    return np.array((dxdt, dydt))
-u = np.array((6.,-1.))
-t_span = (0., 3.)
-guess = np.array((0., 3.))
-f = lambda t, u: bvp(t, u)
-pp.shoot_bvp(f, u, guess, t_span)
+
+import sympy as sm
+
+r,c = sm.symbols('r, c')
+R,C = pred_ode(np.nan, (r,c))
+REqual = sm.Eq(R, 0)
+CEqual = sm.Eq(C, 0)
+
+# compute fixed points
+equilibria = sm.solve( (REqual, CEqual), r, c)
+print(equilibria)
+
+
+
+
+find_equilibria(pred_ode,2)

@@ -150,8 +150,12 @@ def solve_ode(func, t_span, X, stepsize, method, deltat_max=2, points=0):
     Parameters
     ---------
     func : callable
+           Callable function of the ODE to solve, in which the ODE is converted to a
+           system of first order differential equations.
 
     t_span : tuple of floats, size(2,)
+             Tuple containing time limit values defining a time period for which
+             to solve for.
 
     X : array-like, size(D,)
         Array of length D the number of dimensions of the system containing
