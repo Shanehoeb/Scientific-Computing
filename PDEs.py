@@ -6,25 +6,6 @@ from scipy.sparse import diags
 from scipy.sparse.linalg import spsolve
 import numpy as np
 
-
-def default_heat_params():
-    return{
-        "L": 1.,
-        "kappa": 1.,
-        "T": 0.5
-    }
-
-def u_I(x,params):
-    # initial temperature distribution
-    y = np.sin(pi*x/params["L"])
-    return y
-
-def u_exact(x,t,params):
-    # the exact solution
-    y = np.exp(-params["kappa"]*(pi**2/params["L"]**2)*t)*np.sin(pi*x/params["L"])
-    return y
-
-
 def calc_lambda(deltat,deltax,params):
     return params["kappa"] * deltat / (deltax ** 2)
 
@@ -66,22 +47,10 @@ def component_feuler(u_I, params, mx=60, mt=8000, plot=False):
     if plot:
         plt.plot(x, u_j, 'ro', label='num')
         plt.show()
-    print(u_j)
     return x, u_j
 
 
-def vectorised_feuler(u_I, params, mx=60, mt=8000, plot=False):
-    x, t, deltax, deltat, u_j, _ = setup_env(params, mx, mt)
-    lmbda = calc_lambda(deltat, deltax, params) # mesh fourier number
-    # Set initial condition
-    for i in range(0, mx+1):
-        u_j[i] = u_I(x[i], params)
-    u_j[0] = 0
-    u_j[mx] = 0
-
-    if lmbda > 0.5:
-        print("Change mx and mt to proceed !")
-        return
+def forward_euler(lmbda, u_j, mx, mt):
     n = round(mx - 1)
     k = np.array([lmbda * np.ones(n - 1), np.ones(n) - 2 * lmbda, lmbda * np.ones(n - 1)], dtype=np.dtype(object))
     offset = [-1, 0, 1]
@@ -93,24 +62,12 @@ def vectorised_feuler(u_I, params, mx=60, mt=8000, plot=False):
         for element in sol:
             u_j.append(element)
         u_j.append(0)
-    if plot:
-        plt.plot(x, u_j, 'ro', label='num')
-        plt.show()
-
-    return x, u_j
+    return u_j
 
 
-def vectorised_back_euler(u_I, params, mx=100, mt=100, plot=False):
-    x, t, deltax, deltat, u_j, _ = setup_env(params, mx, mt)
-    lmbda = calc_lambda(deltat, deltax, params)  # mesh fourier number
-    # Set initial condition
-    for i in range(0, mx + 1):
-        u_j[i] = u_I(x[i], params)
-    u_j[0] = 0
-    u_j[mx] = 0
-
+def backwards_euler(lmbda, u_j, mx, mt):
     n = round(mx - 1)
-    k = np.array([-lmbda * np.ones(n - 1), 2*lmbda +np.ones(n), -lmbda * np.ones(n - 1)], dtype=np.dtype(object))
+    k = np.array([-lmbda * np.ones(n - 1), 2 * lmbda + np.ones(n), -lmbda * np.ones(n - 1)], dtype=np.dtype(object))
     offset = [-1, 0, 1]
     A = diags(k, offset, format='csr')
     for i in range(mt):
@@ -120,30 +77,19 @@ def vectorised_back_euler(u_I, params, mx=100, mt=100, plot=False):
         for element in sol:
             u_j.append(element)
         u_j.append(0)
-
-    if plot:
-        plt.plot(x, u_j, 'ro', label='num')
-        plt.show()
-
-    return x, u_j
+    return u_j
 
 
-def crank_nicholson(u_I, params, mx=100, mt=100, plot=False):
-    x, t, deltax, deltat, u_j, _ = setup_env(params, mx, mt)
-    lmbda = calc_lambda(deltat, deltax, params)  # mesh fourier number
-    # Set initial condition
-    for i in range(0, mx + 1):
-        u_j[i] = u_I(x[i], params)
-    u_j[0] = 0
-    u_j[mx] = 0
-
+def crank_nicholson(lmbda, u_j, mx, mt):
     n = round(mx - 1)
 
-    k = np.array([(-lmbda/2) * np.ones(n - 1), lmbda +np.ones(n), (-lmbda/2) * np.ones(n - 1)], dtype=np.dtype(object))
+    k = np.array([(-lmbda / 2) * np.ones(n - 1), lmbda + np.ones(n), (-lmbda / 2) * np.ones(n - 1)],
+                 dtype=np.dtype(object))
     offset = [-1, 0, 1]
     A = diags(k, offset, format='csr')
 
-    k2 = np.array([(lmbda/2) * np.ones(n - 1), np.ones(n) - lmbda, (lmbda/2)  * np.ones(n - 1)], dtype=np.dtype(object))
+    k2 = np.array([(lmbda / 2) * np.ones(n - 1), np.ones(n) - lmbda, (lmbda / 2) * np.ones(n - 1)],
+                  dtype=np.dtype(object))
     B = diags(k2, offset, format='csr')
     for i in range(mt):
         past_u_j = u_j[1:mx]
@@ -153,10 +99,31 @@ def crank_nicholson(u_I, params, mx=100, mt=100, plot=False):
         for element in sol:
             u_j.append(element)
         u_j.append(0)
+    return u_j
+
+
+def pde_solver(u_I, params, mx=100, mt=100, method="ck", plot=False):
+    x, t, deltax, deltat, u_j, _ = setup_env(params, mx, mt)
+    lmbda = calc_lambda(deltat, deltax, params)  # mesh fourier number
+    # Set initial condition
+    for i in range(0, mx + 1):
+        u_j[i] = u_I(x[i], params)
+    u_j[0] = 0
+    u_j[mx] = 0
+
+    if method == "ck":
+        u_j = crank_nicholson(lmbda, u_j, mx, mt)
+    elif method == "f-euler":
+        if lmbda < 0.5:
+            u_j = forward_euler(lmbda, u_j, mx, mt)
+        else:
+            print("Leads to unstable solutions, change grid properties.")
+            return
+    elif method == "b-euler":
+        u_j = crank_nicholson(lmbda, u_j, mx, mt)
 
     if plot:
         plt.plot(x, u_j, 'ro', label='num')
         plt.show()
 
     return x, u_j
-
