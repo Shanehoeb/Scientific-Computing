@@ -12,7 +12,7 @@ class MyTestCase(unittest.TestCase):
     def test_euler(self):
         stepsize = 0.005
         t = 0
-        sol, t_new = euler_step(stepsize, pred_ode,[0.5, 0.5], t)
+        sol, t_new = euler_step(stepsize, pred_ode, [0.5, 0.5], t)
         real = [0.49916696, 0.49999948]
         assert np.isclose(t_new, t + stepsize) and np.allclose(sol, real)
 
@@ -61,6 +61,11 @@ class MyTestCase(unittest.TestCase):
         for i in range(len(equilibria)):
             check_list.append(np.allclose(pred_ode(np.nan, np.array((equilibria[i]), dtype="float64")),0))
         assert all(check_list)
+
+    def test_shoot(self):
+        pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
+
+        assert np.allclose(ns.shoot((0.33, 0.33, 18), pred_ode, plot=False),[0.38917637, 0.29880049, 18.38318297])
 
 if __name__ == '__main__':
     unittest.main()

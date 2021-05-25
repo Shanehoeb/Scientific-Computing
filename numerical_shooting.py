@@ -75,12 +75,12 @@ def vector_eq(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, de
 
     for i in range(len(solution)):
         values.append(solution[i][-1])
-    print((initialu - values))
     return np.concatenate(((initialu - values), phase_cond))
 
 
 def shoot(init_guess, ode, plot=False):
-    a = lambda init_guess, ode: vector_eq(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, index=0)
-    solution = fsolve(a, init_guess, ode)
+    cond = lambda init_guess, ode: vector_eq(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, index=0)
+    solution = fsolve(cond, init_guess, ode)
     if plot:
         pp.time_simulation(ode, solution[:-1], (0, solution[-1]), plot=True)
+    return solution
