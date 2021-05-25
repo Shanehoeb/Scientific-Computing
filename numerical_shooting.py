@@ -68,17 +68,19 @@ def vector_eq(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, de
        Necessary equation to find limit cycle of ODEs. Numpy array at [0]
        Float at [1]
                     """
-    initialu, t_period = init_guess
+    initialu, t_period = init_guess[:-1], init_guess[-1]
     phase_cond = phase_condition(ode, initialu, index)
     t_array, solution = pp.time_simulation(ode, initialu, (0, t_period), solver, method, stepsize, deltat_max)
     values = []
 
     for i in range(len(solution)):
         values.append(solution[i][-1])
-    print((initialu - values)[index])
+    print((initialu - values))
     return np.concatenate(((initialu - values), phase_cond))
 
 
-def shoot(init_guess, ode):
-    solution = fsolve(lambda shot, ode: vector_eq(shot, ode), init_guess, ode)
-    print(solution)
+def shoot(init_guess, ode, plot=False):
+    a = lambda init_guess, ode: vector_eq(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, index=0)
+    solution = fsolve(a, init_guess, ode)
+    if plot:
+        pp.time_simulation(ode, solution[:-1], (0, solution[-1]), plot=True)

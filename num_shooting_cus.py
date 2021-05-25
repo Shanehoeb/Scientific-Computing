@@ -7,7 +7,7 @@ import matplotlib.patches as mpatches
 def defaults_pred_prey():
     return {
         "a": 1.,
-        "b": 0.25,
+        "b": 0.26,
         "d": 0.1
     }
 def pred_prey(t, z, p):
@@ -19,8 +19,8 @@ def pred_prey(t, z, p):
 
 
 pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
-a = pp.time_simulation(pred_ode, (0.32, 0.32), (0, 18.5), "custom", plot=True)
-(t1, u1) = pp.orbit(pred_ode, (0.32, 0.32), (0, 18.5), solver="custom", plot=True)
+a = pp.time_simulation(pred_ode, (0.27, 0.27), (0, 18), "custom", plot=True)
+(t1, u1) = pp.orbit(pred_ode, (0.27, 0.27), (0, 18), solver="custom", plot=True)
 
 
 # Single out periodic orbit
