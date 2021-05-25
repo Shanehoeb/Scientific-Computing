@@ -20,5 +20,5 @@ def pred_prey(t, z, p):
 
 pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
 
-
-pde.vectorised_feuler(pde.u_I, params=pde.default_heat_params(),plot=True)
+#pde.component_feuler(pde.u_I, params=pde.default_heat_params(), plot=True)
+pde.crank_nicholson(pde.u_I, params=pde.default_heat_params(), plot=True)

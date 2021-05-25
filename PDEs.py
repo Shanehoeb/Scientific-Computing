@@ -3,6 +3,7 @@ import numpy as np
 from math import pi
 import matplotlib.pyplot as plt
 from scipy.sparse import diags
+from scipy.sparse.linalg import spsolve
 import numpy as np
 
 
@@ -40,14 +41,14 @@ def setup_env(params,mx,mt):
     return x,t,deltax,deltat,u_j,u_jp1
 
 
-def component_feuler(u_I, params, mx=10, mt=100, plot=False):
+def component_feuler(u_I, params, mx=60, mt=8000, plot=False):
     # Set up the numerical environment variables
     x, t, deltax, deltat, u_j, u_jp1 = setup_env(params, mx, mt)
     lmbda = calc_lambda(deltat,deltax,params) # mesh fourier number
 
     # Set initial condition
     for i in range(0, mx + 1):
-        u_j[i] = u_I(x[i],params)
+        u_j[i] = u_I(x[i], params)
 
     # Solve the PDE: loop over all time points
     for j in range(0, mt):
@@ -65,50 +66,97 @@ def component_feuler(u_I, params, mx=10, mt=100, plot=False):
     if plot:
         plt.plot(x, u_j, 'ro', label='num')
         plt.show()
-
+    print(u_j)
     return x, u_j
+
 
 def vectorised_feuler(u_I, params, mx=60, mt=8000, plot=False):
     x, t, deltax, deltat, u_j, _ = setup_env(params, mx, mt)
     lmbda = calc_lambda(deltat, deltax, params) # mesh fourier number
-    results = []
     # Set initial condition
-    for i in range(1, mx):
+    for i in range(0, mx+1):
         u_j[i] = u_I(x[i], params)
+    u_j[0] = 0
+    u_j[mx] = 0
 
     if lmbda > 0.5:
         print("Change mx and mt to proceed !")
         return
-    n = round(mx+1)
+    n = round(mx - 1)
     k = np.array([lmbda * np.ones(n - 1), np.ones(n) - 2 * lmbda, lmbda * np.ones(n - 1)], dtype=np.dtype(object))
     offset = [-1, 0, 1]
     A = diags(k, offset).toarray()
     for i in range(mt):
-        u_j = A.dot(u_j)
-        results.append(u_j)
-
+        past_u_j = u_j[1:mx]
+        sol = A.dot(past_u_j)
+        u_j = [0]
+        for element in sol:
+            u_j.append(element)
+        u_j.append(0)
     if plot:
-        for i in range(len(results)):
-            plt.plot(x, results[i], 'ro', label='num')
+        plt.plot(x, u_j, 'ro', label='num')
         plt.show()
-    return x, results
+
+    return x, u_j
 
 
-def vectorised_back_euler(u_I, params, mx=60, mt=8000, plot=False):
+def vectorised_back_euler(u_I, params, mx=100, mt=100, plot=False):
     x, t, deltax, deltat, u_j, _ = setup_env(params, mx, mt)
-    lmbda = calc_lambda(deltat, deltax, params) # mesh fourier number
-    results = []
+    lmbda = calc_lambda(deltat, deltax, params)  # mesh fourier number
     # Set initial condition
-    for i in range(1, mx):
+    for i in range(0, mx + 1):
         u_j[i] = u_I(x[i], params)
+    u_j[0] = 0
+    u_j[mx] = 0
 
-    n = round(mx + 1)
+    n = round(mx - 1)
     k = np.array([-lmbda * np.ones(n - 1), 2*lmbda +np.ones(n), -lmbda * np.ones(n - 1)], dtype=np.dtype(object))
     offset = [-1, 0, 1]
-    A = diags(k, offset).toarray()
+    A = diags(k, offset, format='csr')
+    for i in range(mt):
+        past_u_j = u_j[1:mx]
+        sol = spsolve(A, past_u_j)
+        u_j = [0]
+        for element in sol:
+            u_j.append(element)
+        u_j.append(0)
+
+    if plot:
+        plt.plot(x, u_j, 'ro', label='num')
+        plt.show()
+
+    return x, u_j
 
 
-    pass
+def crank_nicholson(u_I, params, mx=100, mt=100, plot=False):
+    x, t, deltax, deltat, u_j, _ = setup_env(params, mx, mt)
+    lmbda = calc_lambda(deltat, deltax, params)  # mesh fourier number
+    # Set initial condition
+    for i in range(0, mx + 1):
+        u_j[i] = u_I(x[i], params)
+    u_j[0] = 0
+    u_j[mx] = 0
 
-def crank_nicholson():
-    pass
+    n = round(mx - 1)
+
+    k = np.array([(-lmbda/2) * np.ones(n - 1), lmbda +np.ones(n), (-lmbda/2) * np.ones(n - 1)], dtype=np.dtype(object))
+    offset = [-1, 0, 1]
+    A = diags(k, offset, format='csr')
+
+    k2 = np.array([(lmbda/2) * np.ones(n - 1), np.ones(n) - lmbda, (lmbda/2)  * np.ones(n - 1)], dtype=np.dtype(object))
+    B = diags(k2, offset, format='csr')
+    for i in range(mt):
+        past_u_j = u_j[1:mx]
+        eq = B.dot(past_u_j)
+        sol = spsolve(A, eq)
+        u_j = [0]
+        for element in sol:
+            u_j.append(element)
+        u_j.append(0)
+
+    if plot:
+        plt.plot(x, u_j, 'ro', label='num')
+        plt.show()
+
+    return x, u_j
+
