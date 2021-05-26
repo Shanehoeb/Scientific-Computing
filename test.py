@@ -56,15 +56,15 @@ class MyTestCase(unittest.TestCase):
         assert np.allclose([pred_ode(0, u)[0] for u in zip(u1, u2)], 0)
 
     def test_equilibria(self):
-        equilibria = pp.find_equilibria(pred_ode,2)
+        equilibria = pp.find_equilibria(pred_ode, 2)
         check_list = []
         for i in range(len(equilibria)):
-            check_list.append(np.allclose(pred_ode(np.nan, np.array((equilibria[i]), dtype="float64")),0))
+            check_list.append(np.allclose(pred_ode(np.nan, np.array((equilibria[i]), dtype="float64")), 0))
         assert all(check_list)
 
     def test_shoot(self):
         pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
-        assert np.allclose(ns.shoot((0.33, 0.33, 18), pred_ode, plot=False),[0.38917637, 0.29880049, 18.38318297])
+        assert np.allclose(ns.shoot((0.33, 0.33, 18), pred_ode, plot=False), [0.38917637, 0.29880049, 18.38318297])
 
 if __name__ == '__main__':
     unittest.main()

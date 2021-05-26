@@ -77,6 +77,7 @@ def zero_case(past_u_j, A):
     u_j.append(0)
     return u_j
 
+
 def dirichlet_case(past_u_j, A, lmbda, mt, bound_funcs):
     dir_vec = np.zeros(len(past_u_j))
     p, q = bound_funcs
@@ -88,7 +89,6 @@ def dirichlet_case(past_u_j, A, lmbda, mt, bound_funcs):
         u_j.append(element)
     u_j.append(q(mt))
     return u_j
-
 
 
 def neumann_case(past_u_j, A, lmbda, mt, deltax, bound_funcs):
@@ -114,10 +114,11 @@ def periodic_case(past_u_j, A):
     u_j = np.append(u_j, u_j[-1])
     return u_j
 
+def heat_source(f, x, t, deltat):
+    return deltat*f(x,t)
 
 
-
-def forward_euler(lmbda, u_j, mx, mt, deltax, bound_funcs=(p, q), boundary_conds="zero"):
+def forward_euler(lmbda, u_j, mx, mt, deltax, bound_funcs=(p, q), boundary_conds="zero", pde_type=""):
     """Approximates the PDE solution using forward euler finite difference.
 
        Parameters
@@ -249,7 +250,7 @@ def crank_nicholson(lmbda, u_j, mx, mt):
     return u_j
 
 
-def pde_solver(u_I, params, mx=100, mt=100, method="ck", plot=False):
+def pde_solver(u_I, params, mx=100, mt=100, pde_type="", method="ck", plot=False):
     """Top level PDE solver. Returns PDE solution values approximated with chosen
         method.
 
@@ -293,7 +294,7 @@ def pde_solver(u_I, params, mx=100, mt=100, method="ck", plot=False):
         u_j = crank_nicholson(lmbda, u_j, mx, mt)
     elif method == "f-euler":
         if lmbda < 0.5:
-            u_j = forward_euler(lmbda, u_j, mx, mt, deltax, boundary_conds="periodic")#change this hard code
+            u_j = forward_euler(lmbda, u_j, mx, mt, deltax, boundary_conds="periodic", pde_type=pde_type)#change this hard code
         else:
             print("Leads to unstable solutions, change grid properties.")
             return
