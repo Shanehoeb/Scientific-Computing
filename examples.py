@@ -21,7 +21,7 @@ def pred_prey(t, z, p):
 
 pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
 
-
+ns.shoot((0.33, 0.33, 18), pred_ode, plot=True)
 def default_heat_params():
     return{
         "L": 1.,
@@ -33,5 +33,5 @@ def u_I(x,params):
     # initial temperature distribution
     y = np.sin(pi*x/params["L"])
     return y
-pde.pde_solver(u_I, params=default_heat_params(), method="ck", plot=True)
+pde.pde_solver(u_I, params=default_heat_params(), method="f-euler", plot=True, mx=60, mt=8000)
 

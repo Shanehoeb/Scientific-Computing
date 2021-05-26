@@ -4,7 +4,7 @@ from scipy.sparse.linalg import spsolve
 import numpy as np
 
 
-def calc_lambda(deltat,deltax,params):
+def calc_lambda(deltat, deltax, params):
     """Calculates the value of lambda for the diffusion PDE.
        Parameters
        ---------
@@ -63,8 +63,52 @@ def setup_env(mx, mt, params):
     u_jp1 = np.zeros(x.size)  # u at next time step
     return x, t, deltax, deltat, u_j, u_jp1
 
+def p(t):
+    return t+7
+def q(t):
+    return t+7
 
-def forward_euler(lmbda, u_j, mx, mt):
+
+def zero_case(past_u_j, A):
+    sol = A.dot(past_u_j)
+    u_j = [0]
+    for element in sol:
+        u_j.append(element)
+    u_j.append(0)
+    return u_j
+
+def dirichlet_case(past_u_j, A, lmbda, mt, bound_funcs):
+    dir_vec = np.zeros(len(past_u_j))
+    p, q = bound_funcs
+    dir_vec[0] = p(mt)
+    dir_vec[-1] = q(mt)
+    sol = A.dot(past_u_j) + lmbda * np.array(dir_vec)
+    u_j = [p(mt)]
+    for element in sol:
+        u_j.append(element)
+    u_j.append(q(mt))
+    return u_j
+
+
+
+def neumann_case(past_u_j, A, lmbda, mt, deltax, bound_funcs):
+    p, q = bound_funcs
+    past_u_j = np.append(p(mt), past_u_j)
+    past_u_j = np.append(past_u_j, q(mt))
+    dir_vec = np.zeros(len(past_u_j))
+    p, q = bound_funcs
+    dir_vec[0] = -p(mt)
+    dir_vec[-1] = q(mt)
+    sol = A.dot(past_u_j) + 2*lmbda * deltax*np.array(dir_vec)
+    u_j = []
+    for element in sol:
+        u_j.append(element)
+    print(u_j)
+    return u_j
+
+
+
+def forward_euler(lmbda, u_j, mx, mt, deltax, bound_funcs=(p, q), boundary_conds="zero"):
     """Approximates the PDE solution using forward euler finite difference.
 
        Parameters
@@ -82,7 +126,7 @@ def forward_euler(lmbda, u_j, mx, mt):
 
        Returns
        ---------
-       Solution vector at the last point in time array."""
+       Solution vector at the last point in time array using forward euler."""
     # Create appropriate tri-diagonal matrix
     n = round(mx - 1)
     k = np.array([lmbda * np.ones(n - 1), np.ones(n) - 2 * lmbda, lmbda * np.ones(n - 1)], dtype=np.dtype(object))
@@ -91,11 +135,18 @@ def forward_euler(lmbda, u_j, mx, mt):
     # Calculate for each time step
     for i in range(mt):
         past_u_j = u_j[1:mx]
-        sol = A.dot(past_u_j)
-        u_j = [0]
-        for element in sol:
-            u_j.append(element)
-        u_j.append(0)
+        if boundary_conds == "zero":
+            u_j = zero_case(past_u_j, A)
+        if boundary_conds == "dirichlet":
+            u_j = dirichlet_case(past_u_j, A, lmbda, mt, bound_funcs)
+        if boundary_conds == "neumann":
+            n = round(mx + 1)
+            k = np.array([lmbda * np.ones(n - 1), np.ones(n) - 2 * lmbda, lmbda * np.ones(n - 1)],
+                         dtype=np.dtype(object))
+            offset = [-1, 0, 1]
+            A = diags(k, offset).toarray()
+            u_j = neumann_case(past_u_j, A, lmbda, mt, deltax, bound_funcs)
+
     # Return final vector
     return u_j
 
@@ -223,7 +274,7 @@ def pde_solver(u_I, params, mx=100, mt=100, method="ck", plot=False):
         u_j = crank_nicholson(lmbda, u_j, mx, mt)
     elif method == "f-euler":
         if lmbda < 0.5:
-            u_j = forward_euler(lmbda, u_j, mx, mt)
+            u_j = forward_euler(lmbda, u_j, mx, mt, deltax, boundary_conds="neumann")#change this hard code
         else:
             print("Leads to unstable solutions, change grid properties.")
             return
@@ -239,6 +290,31 @@ def pde_solver(u_I, params, mx=100, mt=100, method="ck", plot=False):
 
 # Function constructed from Martin's file
 def component_feuler(u_I, params, mx=60, mt=8000, plot=False):
+    """
+
+       Parameters
+       ---------
+       u_I : func
+             Function describing initial temperature distribution
+
+       params : dict
+                Parameters of the PDE.
+
+       mx : int
+            Number of grid points in space.
+
+       mt : int
+            Number of grid points in time.
+
+       plot: bool
+             Boolean value passed by the user; if True, a plot of the calculated
+             solutions of the PDE will be generated.
+
+       Returns
+       ---------
+       Solution vector at the last point in time array using forward euler step.
+    """
+
     # Set up the numerical environment variables
     x, t, deltax, deltat, u_j, u_jp1 = setup_env(mx, mt, params)
     lmbda = calc_lambda(deltat,deltax,params) # mesh fourier number

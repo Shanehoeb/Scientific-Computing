@@ -64,7 +64,6 @@ class MyTestCase(unittest.TestCase):
 
     def test_shoot(self):
         pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
-
         assert np.allclose(ns.shoot((0.33, 0.33, 18), pred_ode, plot=False),[0.38917637, 0.29880049, 18.38318297])
 
 if __name__ == '__main__':

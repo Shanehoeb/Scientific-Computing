@@ -78,9 +78,22 @@ def vector_eq(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, de
     return np.concatenate(((initialu - values), phase_cond))
 
 
-def shoot(init_guess, ode, plot=False):
-    cond = lambda init_guess, ode: vector_eq(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, index=0)
+def shoot(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, index=0, plot=False):
+    """Numerical shooting method to find an ODEs limit cycle/periodic orbit.
+
+       Parameters
+       ---------
+       init_guess : tuple of length 2
+                    [0] Contains a Numpy array of initial values
+                        of the ODE
+                    [1] Contains a float of time t which is the guess
+                        for the value of the period T of the ODE.
+       ode : callable
+             Callable function of the ODE to solve, in which the ODE is converted to a
+             system of first order differential equations.
+    """
+    cond = lambda guess, func: vector_eq(guess, func, solver=solver, method=method, stepsize=stepsize, deltat_max=deltat_max, index=index)
     solution = fsolve(cond, init_guess, ode)
     if plot:
-        pp.time_simulation(ode, solution[:-1], (0, solution[-1]), plot=True)
+        pp.orbit(ode, solution[:-1], (0, solution[-1]), plot=True)
     return solution
