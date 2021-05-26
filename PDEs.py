@@ -106,6 +106,15 @@ def neumann_case(past_u_j, A, lmbda, mt, deltax, bound_funcs):
     print(u_j)
     return u_j
 
+def periodic_case(past_u_j, A):
+    sol = A.dot(past_u_j)
+    u_j = []
+    for element in sol:
+        u_j.append(element)
+    u_j = np.append(u_j, u_j[-1])
+    return u_j
+
+
 
 
 def forward_euler(lmbda, u_j, mx, mt, deltax, bound_funcs=(p, q), boundary_conds="zero"):
@@ -146,6 +155,16 @@ def forward_euler(lmbda, u_j, mx, mt, deltax, bound_funcs=(p, q), boundary_conds
             offset = [-1, 0, 1]
             A = diags(k, offset).toarray()
             u_j = neumann_case(past_u_j, A, lmbda, mt, deltax, bound_funcs)
+        if boundary_conds == "periodic":
+            past_u_j = u_j[:mx]
+            n = round(mx)
+            k = np.array([lmbda * np.ones(n - 1), np.ones(n) - 2 * lmbda, lmbda * np.ones(n - 1)],
+                         dtype=np.dtype(object))
+            offset = [-1, 0, 1]
+            A = diags(k, offset).toarray()
+            A[-1][0] = lmbda
+            A[0][-1] = lmbda
+            u_j = periodic_case(past_u_j, A)
 
     # Return final vector
     return u_j
@@ -274,7 +293,7 @@ def pde_solver(u_I, params, mx=100, mt=100, method="ck", plot=False):
         u_j = crank_nicholson(lmbda, u_j, mx, mt)
     elif method == "f-euler":
         if lmbda < 0.5:
-            u_j = forward_euler(lmbda, u_j, mx, mt, deltax, boundary_conds="neumann")#change this hard code
+            u_j = forward_euler(lmbda, u_j, mx, mt, deltax, boundary_conds="periodic")#change this hard code
         else:
             print("Leads to unstable solutions, change grid properties.")
             return
