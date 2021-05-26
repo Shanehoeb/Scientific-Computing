@@ -35,5 +35,8 @@ def u_I(x,params):
     # initial temperature distribution
     y = np.sin(pi*x/params["L"])
     return y
-pde.pde_solver(u_I, params=default_heat_params(), method="f-euler", plot=True, mx=60, mt=8000)
 
+def h(x, t):
+    return 2*x + t
+
+pde.pde_solver(u_I, params=default_heat_params(), mx=60, mt=8000, boundary_conds="zero", pde_type="heat_source", method="f-euler", heat_func=h, plot=True)

@@ -118,7 +118,7 @@ def heat_source(f, x, t, deltat):
     return deltat*f(x,t)
 
 
-def forward_euler(lmbda, u_j, mx, mt, deltax, bound_funcs=(p, q), boundary_conds="zero", pde_type=""):
+def forward_euler(lmbda, u_j, mx, mt, deltax, deltat, bound_funcs=(p, q), boundary_conds="zero", pde_type="", heat_func=None):
     """Approximates the PDE solution using forward euler finite difference.
 
        Parameters
@@ -166,7 +166,12 @@ def forward_euler(lmbda, u_j, mx, mt, deltax, bound_funcs=(p, q), boundary_conds
             A[-1][0] = lmbda
             A[0][-1] = lmbda
             u_j = periodic_case(past_u_j, A)
+        if pde_type == "heat_source":
+            heat_vec = np.zeros(len(u_j))
+            for j in range(len(heat_vec)):
+                heat_vec[j] = heat_source(heat_func, j, mx*deltat, deltat)
 
+            u_j = np.array(u_j) + heat_vec
     # Return final vector
     return u_j
 
@@ -250,7 +255,7 @@ def crank_nicholson(lmbda, u_j, mx, mt):
     return u_j
 
 
-def pde_solver(u_I, params, mx=100, mt=100, pde_type="", method="ck", plot=False):
+def pde_solver(u_I, params, mx=100, mt=100, boundary_conds="zero", pde_type="", method="ck", heat_func=None, plot=False):
     """Top level PDE solver. Returns PDE solution values approximated with chosen
         method.
 
@@ -294,7 +299,7 @@ def pde_solver(u_I, params, mx=100, mt=100, pde_type="", method="ck", plot=False
         u_j = crank_nicholson(lmbda, u_j, mx, mt)
     elif method == "f-euler":
         if lmbda < 0.5:
-            u_j = forward_euler(lmbda, u_j, mx, mt, deltax, boundary_conds="periodic", pde_type=pde_type)#change this hard code
+            u_j = forward_euler(lmbda, u_j, mx, mt, deltax, deltat, boundary_conds=boundary_conds, pde_type=pde_type, heat_func=heat_func)#change this hard code
         else:
             print("Leads to unstable solutions, change grid properties.")
             return
