@@ -68,9 +68,16 @@ fig.tight_layout()
 fig.show()
 
 # Natural Parameter Continuation for parameter b in [0.1, 0.5]
-x, u_j = natural_continuation((0.79, 0.18, 30.), pred_prey, (0.1, 0.5), 0.005, "b", defaults_pred_prey(),
+# Initial guess for initial conditions & period T
+init_guess = (0.79, 0.18, 30.)
+# Range of parameter values to be tested for b
+p_span = (0.1, 0.5)
+# Set parameter to change
+param_string = "b"
+# Calculate natural parameter continuation
+x, u_j = natural_continuation(init_guess, pred_prey, p_span, 0.005, param_string, defaults_pred_prey(),
                               solver="custom", method="rk4", stepsize=0.125, deltat_max=20, index=0, plot=False)
-plt.plot(x, u_j, "ro", label="X value in limit cycle")
+plt.plot(x, u_j, "ro", label="X value in Limit Cycle")
 plt.xlabel("b")
 plt.ylabel("x")
 plt.title("Natural Parameter Continuation with Numerical Shooting")
