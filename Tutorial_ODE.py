@@ -38,7 +38,7 @@ axs[0, 0].plot(t_array, sol[0], label="x")
 axs[0, 0].plot(t_array, sol[1], label="y")
 axs[0, 0].legend()
 axs[0, 0].set_title("Custom Time Series Simulation for initial conditions %s" % ((0.27, 0.27) ,))
-axs[0, 0].set(xlabel="t", ylabel='f(x,y)')
+axs[0, 0].set(xlabel="t", ylabel='f(t,u)')
 
 # Orbit of the ODE
 (t1, u1) = pp.orbit(pred_ode, initialu, t_span, solver="custom", plot=False)
@@ -53,7 +53,7 @@ axs[1, 0].plot(t_array1, sol1[0], label="x")
 axs[1, 0].plot(t_array1, sol1[1], label="y")
 axs[1, 0].legend()
 axs[1, 0].set_title("Scipy Time Series Simulation for initial conditions %s" % ((0.27, 0.27) ,))
-axs[1, 0].set(xlabel="t", ylabel='f(x,y)')
+axs[1, 0].set(xlabel="t", ylabel='f(t,u)')
 
 # Orbit of the ODE
 (t2, u2) = pp.orbit(pred_ode, initialu, t_span, solver="scipy", plot=False)
