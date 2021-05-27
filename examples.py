@@ -11,7 +11,7 @@ from math import pi
 def defaults_pred_prey():
     return {
         "a": 1.,
-        "b": 0.25,
+        "b": 0.11,
         "d": 0.1
     }
 def pred_prey(t, z, p):
@@ -20,10 +20,13 @@ def pred_prey(t, z, p):
     dydt = p['b']*y*(1 - (y/x))
     return np.array((dxdt, dydt))
 
-#natural_continuation((0.33, 0.33, 18), pred_prey, (0.1, 0.5), 0.001, "b", defaults_pred_prey(),solver="custom", method="rk4", stepsize=0.005, deltat_max=2, index=0, plot=True)
+#natural_continuation((0.79, 0.18, 30.), pred_prey, (0.1, 0.5), 0.005, "b", defaults_pred_prey(),solver="custom", method="rk4", stepsize=0.005, deltat_max=20, index=0, plot=True)
 
-#pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
-#ns.shoot((0.33, 0.33, 18), pred_ode, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, index=0, plot=False)
+pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
+a = ns.shoot((0.32, 0.32, 30.), pred_ode, solver="custom", method="rk4", stepsize=0.005, deltat_max=20, index=0, plot=True)
+print(a)
+print(pp.time_simulation(pred_ode, a[:-1], (0, 100))[1][-1][-1])
+
 def default_heat_params():
     return{
         "L": 1.,
@@ -39,4 +42,4 @@ def u_I(x,params):
 def h(x, t):
     return 2*x + t
 
-pde.pde_solver(u_I, params=default_heat_params(), mx=60, mt=8000, boundary_conds="zero", pde_type="heat_source", method="f-euler", heat_func=h, plot=True)
+#pde.pde_solver(u_I, params=default_heat_params(), mx=60, mt=8000, boundary_conds="zero", pde_type="heat_source", method="f-euler", heat_func=h, plot=True)

@@ -2,6 +2,18 @@ import unittest
 from phaseportraits import*
 from examples import*
 
+def defaults_pred_prey():
+    return {
+        "a": 1.,
+        "b": 0.11,
+        "d": 0.1
+    }
+def pred_prey(t, z, p):
+    x, y = z
+    dxdt = x*(1-x) - (p['a']*x*y)/(p['d']+x)
+    dydt = p['b']*y*(1 - (y/x))
+    return np.array((dxdt, dydt))
+
 pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
 
 
@@ -28,27 +40,27 @@ class MyTestCase(unittest.TestCase):
         t_1 = 0
         t_2 = 1
         stepsize = 0.005
-        real_rk = [0.34428321, 0.47752384]
-        real_eul = [0.3441899, 0.47760635]
+        real_rk = [0.34113673, 0.48927056]
+        real_eul = [0.34108465, 0.48932033]
         sol, t = solve_to(X, t_1, t_2, stepsize, deltat_max=2, func=pred_ode, method='rk4')
         sol1, t1 = solve_to(X, t_1, t_2, stepsize, deltat_max=2, func=pred_ode, method='euler')
         assert np.isclose(t, t_2) and np.allclose(sol, real_rk) #Test rk4
         assert np.isclose(t1, t_2) and np.allclose(sol1, real_eul)  # Test euler
 
     def test_solve_ode(self):
-        assert "a" == "a"
+        assert np.isclose(solve_ode(pred_ode, (0, 100), (0.79912268, 0.18061336), stepsize=0.005, method="rk4")[1][-1][-1], 0.27005439464182407)
 
     def test_scipy_solver(self):
         assert "a" == "a"
 
     def test_my_solver(self):
-        assert "a" == "a"
+        assert np.isclose(pp.my_solver(pred_ode, (0.79912268, 0.18061336), (0, 100))[1][-1][-1], 0.27005439464182407)
 
     def test_time_simulation(self):
-        assert "a" == "a"
+        assert np.isclose(pp.time_simulation(pred_ode, (0.79912268, 0.18061336), (0, 100))[1][-1][-1], 0.27005439464182407)
 
     def test_orbit(self):
-        assert "a" == "a"
+        assert np.isclose(pp.orbit(pred_ode, (0.79912268, 0.18061336), (0, 100))[1][-1][-1], 0.27005439464182407)
 
     def test_nullcline(self):
         # Good - check values match nullcline definition (approximately)
@@ -64,7 +76,18 @@ class MyTestCase(unittest.TestCase):
 
     def test_shoot(self):
         pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
-        assert np.allclose(ns.shoot((0.33, 0.33, 18), pred_ode, plot=False), [0.38917637, 0.29880049, 18.38318297])
+        assert np.allclose(ns.shoot((0.32, 0.32, 30.), pred_ode, solver="custom", method="rk4", stepsize=0.005, deltat_max=20, index=0, plot=False), [0.79912268,  0.18061336, 31.6038949])
+
+    def test_phase_cond(self):
+        assert True==True
+
+    def test_vec_eq(self):
+        assert True==True
+
+    def test_natural_continuation(self):
+        assert True==True
+
+    # TODO : PDE TESTS
 
 if __name__ == '__main__':
     unittest.main()

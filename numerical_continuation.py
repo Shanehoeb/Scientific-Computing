@@ -7,14 +7,14 @@ def natural_continuation(init_guess, ode, range, p_step, param_string, params, s
     param_list = np.linspace(range[0], range[1], points+1)
     values = []
     for element in param_list:
-        print(element)
         params[param_string] = element
         n_ode = lambda t, u: ode(t, u, params)
         try:
             sol = shoot(init_guess, n_ode, solver=solver, method=method, stepsize=stepsize, deltat_max=deltat_max, index=index, plot=False)
             values.append(sol[index])
+            init_guess = sol
         except:
-            print("Something went wrong at value %s" % str(element))
+            print("Something went wrong at parameter value %s" % str(element))
             values.append(np.nan)
     if plot:
         plt.plot(param_list, values, 'ro', label='num')
@@ -23,7 +23,7 @@ def natural_continuation(init_guess, ode, range, p_step, param_string, params, s
 
 
 
-def pseudo_arclength(sols, func, u):
+def pseudo_eq(sols):
     """
 
        Parameters
@@ -31,11 +31,12 @@ def pseudo_arclength(sols, func, u):
        sols : tuple, size (2,)
               Tuple of numpy arrays containing solutions for (alpha, u) for two different
               alpha values where alpha is a parameter of the ODE
-
     """
     v_0, v_1 = sols
     diff = v_1 - v_0
     v_next = v_1 + diff
-    real_v = lambda u: func(u)
-    eq = np.dot((real_v(u) - v_next), diff)
+    eq = lambda v: np.dot((v-v_next), diff)
     return eq
+
+def pseudo_arclength():
+    pass

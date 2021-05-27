@@ -29,7 +29,7 @@ def phase_condition(ode, initialu, index=0):
     return sol
 
 
-def vector_eq(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, index=0):
+def vector_eq(init_guess, ode, solver="custom", method="rk4", pseudo=False, stepsize=0.005, deltat_max=2, index=0):
     """Calculates phase condition & ODE integration condition.
 
        Parameters
