@@ -40,7 +40,7 @@ axs[0].set_title("Heat Diffusion PDE Forward Euler")
 
 # Finite difference using Backward Euler for 0 valued boundary conditions
 
-x, u_j = pde_solver(u_I, method="b-euler", params=default_heat_params(), mx=1000, mt=1000, plot=False)
+x, u_j = pde_solver(u_I, method="b-euler", params=default_heat_params(), mx=100, mt=100, plot=False)
 axs[1].plot(x, u_j, 'ro', label='num')
 xx = np.linspace(0,params['L'], 250)
 axs[1].plot(xx,u_exact(xx, params['T'], params), 'b-', label='exact')
@@ -53,7 +53,7 @@ fig.show()
 
 
 # Finite difference using Crank-Nicholson for 0 valued boundary conditions
-x, u_j = pde_solver(u_I, method="ck", params=default_heat_params(), mx=1000, mt=1000, plot=False)
+x, u_j = pde_solver(u_I, method="ck", params=default_heat_params(), mx=100, mt=100, plot=False)
 plt.plot(x, u_j, 'ro', label='num')
 xx = np.linspace(0,params['L'], 250)
 plt.plot(xx,u_exact(xx, params['T'], params), 'b-', label='exact')

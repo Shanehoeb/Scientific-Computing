@@ -50,7 +50,7 @@ def scipy_solver(ode, initialu, t_span, plot=False):
     return sol.t, sol.y
 
 
-def my_solver(ode, initialu, t_span, stepsize=0.005, method="rk4", deltat_max=2, plot=True):
+def my_solver(ode, initialu, t_span, stepsize=0.005, method="rk4", deltat_max=2, plot=False):
     """ Uses custom solver to solve initial value problem for an ODE.
 
     Parameters
@@ -215,7 +215,7 @@ def orbit(ode, initialu, t_span, solver="custom", method="rk4", stepsize=0.005, 
               and sol[1] are used to plot orbit.
             """
     if solver == "scipy":
-        _, sol = scipy_solver(ode, initialu, t_span, solver)
+        _, sol = scipy_solver(ode, initialu, t_span, plot=plot)
         if plot:
             # Plot orbit
             plt.plot(sol[0], sol[1], "b-")

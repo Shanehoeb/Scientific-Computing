@@ -1,5 +1,5 @@
 import numpy as np
-import phaseportraits as pp
+import ODEs as pp
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from numerical_continuation import*
