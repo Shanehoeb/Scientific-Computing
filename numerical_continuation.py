@@ -57,18 +57,24 @@ def natural_continuation(init_guess, ode, range, p_step, param_string, params, s
     for limit cycle initial conditions found with numerical shooting.
     """
     points = round((range[1] - range[0])/p_step)
+    # Array of parameter values
     param_list = np.linspace(range[0], range[1], points+1)
     values = []
     for element in param_list:
+        # Increment parameter
         params[param_string] = element
         n_ode = lambda t, u: ode(t, u, params)
         try:
+            # Solve
             sol = shoot(init_guess, n_ode, solver=solver, method=method, stepsize=stepsize, deltat_max=deltat_max, index=index, plot=False)
             values.append(sol[index])
+            # New guess is last solution
             init_guess = sol
         except:
             print("Something went wrong at parameter value %s" % str(element))
             values.append(np.nan)
+            # Errors sometimes encountered
+    # Plot
     if plot:
         plt.plot(param_list, values, 'ro', label='num')
         plt.show()

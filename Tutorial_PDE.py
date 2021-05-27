@@ -25,6 +25,34 @@ def u_exact(x,t, params):
 params = default_heat_params()
 
 # Finite difference using forward euler for 0 valued boundary conditions
+
+x, u_j = pde_solver(u_I, params=default_heat_params(), mx=30, mt=1000, plot=False)
+fig, axs = plt.subplots(2)
+axs[0].plot(x, u_j, 'ro', label='num')
+xx = np.linspace(0,params['L'], 250)
+axs[0].plot(xx,u_exact(xx, params['T'], params), 'b-', label='exact')
+axs[0].set(xlabel="x", ylabel='u(x,0.5)')
+axs[0].legend(loc='upper right')
+axs[0].set_title("Heat Diffusion PDE Forward Euler")
+
+
+
+
+# Finite difference using Backward Euler for 0 valued boundary conditions
+
+x, u_j = pde_solver(u_I, method="b-euler", params=default_heat_params(), mx=1000, mt=1000, plot=False)
+axs[1].plot(x, u_j, 'ro', label='num')
+xx = np.linspace(0,params['L'], 250)
+axs[1].plot(xx,u_exact(xx, params['T'], params), 'b-', label='exact')
+axs[1].set(xlabel="x", ylabel='u(x,0.5)')
+
+axs[1].legend(loc='upper right')
+axs[1].set_title("Heat Diffusion PDE Backward Euler")
+fig.tight_layout()
+fig.show()
+
+
+# Finite difference using Crank-Nicholson for 0 valued boundary conditions
 x, u_j = pde_solver(u_I, method="ck", params=default_heat_params(), mx=1000, mt=1000, plot=False)
 plt.plot(x, u_j, 'ro', label='num')
 xx = np.linspace(0,params['L'], 250)
@@ -32,22 +60,10 @@ plt.plot(xx,u_exact(xx, params['T'], params), 'b-', label='exact')
 plt.xlabel('x')
 plt.ylabel('u(x,0.5)')
 plt.legend(loc='upper right')
-plt.title("Heat Diffusion PDE Crank-Nicholson")
+plt.title("Heat Diffusion PDE Forward Euler Crank-Nicholson")
 plt.show()
 
 
-# Finite difference using Crank-Nicholson for 0 valued boundary conditions
-x, u_j = pde_solver(u_I, params=default_heat_params(), mx=60, mt=8000, plot=False)
-plt.plot(x, u_j, 'ro', label='num')
-xx = np.linspace(0,params['L'], 250)
-plt.plot(xx,u_exact(xx, params['T'], params), 'b-', label='exact')
-plt.xlabel('x')
-plt.ylabel('u(x,0.5)')
-plt.legend(loc='upper right')
-plt.title("Heat Diffusion PDE Forward Euler")
-plt.show()
-
-# Backward Euler also available using method="b-euler"
 
 # Non-Homogeneous Dirichlet Boundary Conditions
 
@@ -62,36 +78,33 @@ def q(t):
 
 x, u_j = pde_solver(u_I, boundary_conds="dirichlet", bound_funcs=(p, q), params=default_heat_params(),
                     mx=60, mt=8000, plot=False)
-plt.plot(x, u_j, 'ro', label='num')
-plt.xlabel('x')
-plt.ylabel('u(x,0.5)')
-plt.legend(loc='upper right')
-plt.title("Heat Diffusion PDE Forward Euler Dirichlet")
-plt.show()
+
+fig, axs = plt.subplots(2, 2)
+fig.set_size_inches(16, 10)
+axs[0, 0].plot(x, u_j, 'ro', label='num')
+axs[0, 0].set(xlabel="x", ylabel='u(x,0.5)')
+axs[0, 0].legend(loc='upper right')
+axs[0, 0].set_title("Heat Diffusion PDE Forward Euler Dirichlet")
 
 
 # Neumann Boundary Conditions
 
 x, u_j = pde_solver(u_I, boundary_conds="neumann", bound_funcs=(p, q), params=default_heat_params(),
                     mx=60, mt=8000, plot=False)
-plt.plot(x, u_j, 'ro', label='num')
-plt.xlabel('x')
-plt.ylabel('u(x,0.5)')
-plt.legend(loc='upper right')
-plt.title("Heat Diffusion PDE Forward Euler Neumann")
-plt.show()
+axs[0, 1].plot(x, u_j, 'ro', label='num')
+axs[0, 1].set(xlabel="x", ylabel='u(x,0.5)')
+axs[0, 1].legend(loc='upper right')
+axs[0, 1].set_title("Heat Diffusion PDE Forward Euler Neumann")
 
 
 # Periodic boundary conditions
 
 x, u_j = pde_solver(u_I, boundary_conds="periodic", params=default_heat_params(),
                     mx=60, mt=8000, plot=False)
-plt.plot(x, u_j, 'ro', label='num')
-plt.xlabel('x')
-plt.ylabel('u(x,0.5)')
-plt.legend(loc='upper right')
-plt.title("Heat Diffusion PDE Forward Euler Periodic")
-plt.show()
+axs[1, 0].plot(x, u_j, 'ro', label='num')
+axs[1, 0].set(xlabel="x", ylabel='u(x,0.5)')
+axs[1, 0].legend(loc='upper right')
+axs[1, 0].set_title("Heat Diffusion PDE Forward Euler Periodic")
 
 
 # Add heat sources inside the domain
@@ -102,12 +115,12 @@ def heat_func(x, t):
 x, u_j = pde_solver(u_I, boundary_conds="zero", pde_type="heat_source",heat_func=heat_func, params=default_heat_params(),
                     mx=60, mt=8000, plot=False)
 
-plt.plot(x, u_j, 'ro', label='num')
-plt.xlabel('x')
-plt.ylabel('u(x,0.5)')
-plt.legend(loc='upper right')
-plt.title("Heat Diffusion PDE Forward Euler with Heat Source")
-plt.show()
+axs[1, 1].plot(x, u_j, 'ro', label='num')
+axs[1, 1].set(xlabel="x", ylabel='u(x,0.5)')
+axs[1, 1].legend(loc='upper right')
+axs[1, 1].set_title("Heat Diffusion PDE Forward Euler with Heat Source")
+fig.tight_layout()
+fig.show()
 
 
 
