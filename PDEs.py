@@ -6,6 +6,7 @@ import numpy as np
 
 def calc_lambda(deltat, deltax, params):
     """Calculates the value of lambda for the diffusion PDE.
+
        Parameters
        ---------
        deltat : float
@@ -207,8 +208,6 @@ def periodic_case(past_u_j, A):
     u_j = np.append(u_j, u_j[-1])
     return u_j
 
-def heat_source(f, x, t, deltat):
-    return deltat*f(x,t)
 
 
 def forward_euler(lmbda, u_j, mx, mt, deltax, deltat, bound_funcs=None, boundary_conds="zero", pde_type="", heat_func=None):
@@ -290,6 +289,8 @@ def forward_euler(lmbda, u_j, mx, mt, deltax, deltat, bound_funcs=None, boundary
             u_j = periodic_case(past_u_j, A)
         # Heat source i
         if pde_type == "heat_source":
+            def heat_source(f, x, t, deltat):
+                return deltat * f(x, t)
             heat_vec = np.zeros(len(u_j))
             for j in range(len(heat_vec)):
                 heat_vec[j] = heat_source(heat_func, j, mx*deltat, deltat)

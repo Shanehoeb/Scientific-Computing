@@ -34,17 +34,17 @@ def vector_eq(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, de
 
        Parameters
        ---------
-       init_guess : tuple of length 2
-                    [0] Contains a Numpy array of initial values
-                        of the ODE
+       init_guess : tuple of length D+1 D dimensions of system
+                    [0:D] Initial values of the ODE
                     [1] Contains a float of time t which is the guess
-                        for the value of the period T of the ODE.
+                        for the value of the period T of the ODE
+
        ode : callable
              Callable function of the ODE to solve, in which the ODE is converted to a
              system of first order differential equations.
+
        solver : string, "scipy" or "custom"
              Choice of solver to use, either scipy's using solve_ivp or custom
-
 
        method : string
                 Desired method to solve the ODE. Options are 4th order Runge-Kutta
@@ -83,9 +83,8 @@ def shoot(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, deltat
 
        Parameters
        ---------
-       init_guess : tuple of length 2
-                    [0] Contains a Numpy array of initial values
-                        of the ODE
+       init_guess : tuple of length D+1 D dimensions of system
+                    [0:D] Initial values of the ODE
                     [1] Contains a float of time t which is the guess
                         for the value of the period T of the ODE.
        ode : callable
