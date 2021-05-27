@@ -22,7 +22,7 @@ def pred_prey(t, z, p):
 # Transoform so only dependant on time and u values.
 pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
 
-
+print("Running Time Simulation...")
 # Initial conditions example
 initialu = (0.27, 0.27)
 # Time period example
@@ -40,6 +40,7 @@ axs[0, 0].legend()
 axs[0, 0].set_title("Custom Time Series Simulation for initial conditions %s" % ((0.27, 0.27) ,))
 axs[0, 0].set(xlabel="t", ylabel='f(t,u)')
 
+print("Computing orbits...")
 # Orbit of the ODE
 (t1, u1) = pp.orbit(pred_ode, initialu, t_span, solver="custom", plot=False)
 # Plot orbit
@@ -67,7 +68,7 @@ fig.tight_layout()
 fig.show()
 
 # ODE analysis : Orbits, Nullclines & Equilibria
-
+print("Computing more orbits...")
 # Plot some orbits
 (t, u) = pp.orbit(pred_ode, (0.8, 0.1), (0,100), solver="custom")
 plt.plot(u[0], u[1], "c-")
@@ -80,6 +81,7 @@ plt.plot(u[0], u[1], "m-")
 (t, u) = pp.orbit(pred_ode, (0.3, 1.0), (0,100), solver="custom")
 plt.plot(u[0], u[1], "y-")
 
+print("Computing nullclines...")
 # V null-cline
 (Vval, Nval) = pp.nullcline(pred_ode, (-0.4, 1.1), index=0)
 plt.plot(Vval, Nval, "b-", linewidth=2)
@@ -89,6 +91,7 @@ plt.plot(Vval, Nval, "b-", linewidth=2)
 (Vval, Nval) = pp.nullcline(pred_ode, (-0.4, 1.1), index=1)
 plt.plot(Vval, Nval, "r-", linewidth=2)
 
+print("Computing equilibria...")
 # Find system equilibria
 equilibria = pp.find_equilibria(pred_ode, 2)
 x_equil = []
@@ -108,3 +111,4 @@ plt.title("Orbits, Nullclines & Equilibria of ODE")
 plt.xlabel("x")
 plt.ylabel("y")
 plt.show()
+print("Done !")

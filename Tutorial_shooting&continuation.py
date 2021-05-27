@@ -1,9 +1,7 @@
-import matplotlib.pyplot as plt
-
 from numerical_continuation import*
 import numerical_shooting as ns
 import ODEs as pp
-import matplotlib.patches as mpatches
+
 
 # Starting default values
 def defaults_pred_prey():
@@ -28,6 +26,7 @@ t_span = (0, 100)
 # Set param values
 pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
 
+print("Generating time simulation of ODE...")
 # Time simulation with custom solver
 t_array, sol = pp.time_simulation(pred_ode, initialu, t_span, solver="custom", plot=False)
 fig, axs = plt.subplots(2)
@@ -38,6 +37,7 @@ axs[0].legend(loc='lower right')
 axs[0].set_title("Time Simulation of ODE")
 
 # Numerical shooting to find initial conditions and period of limit cycle
+print("Numerical Shooting to find period and initial conditions...")
 solut = ns.shoot((0.79, 0.18, 31.), pred_ode, solver="custom", method="rk4", stepsize=0.125, deltat_max=20, index=0, plot=False)
 period = solut[-1] # Period is last entry of solution array
 initial_c = solut[:-1] # Initial values are rest of array
@@ -68,6 +68,7 @@ fig.tight_layout()
 fig.show()
 
 # Natural Parameter Continuation for parameter b in [0.1, 0.5]
+print("Computing natural parameter continuation...")
 # Initial guess for initial conditions & period T
 init_guess = (0.79, 0.18, 30.)
 # Range of parameter values to be tested for b
@@ -83,3 +84,5 @@ plt.ylabel("x")
 plt.title("Natural Parameter Continuation with Numerical Shooting")
 plt.legend(loc="upper right")
 plt.show()
+
+print("Done!")
