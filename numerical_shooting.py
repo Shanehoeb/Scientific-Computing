@@ -29,7 +29,7 @@ def phase_condition(ode, initialu, index=0):
     return sol
 
 
-def vector_eq(init_guess, ode, solver="custom", method="rk4", pseudo=False, stepsize=0.005, deltat_max=2, index=0):
+def vector_eq(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, deltat_max=2, index=0):
     """Calculates phase condition & ODE integration condition.
 
        Parameters
@@ -91,6 +91,29 @@ def shoot(init_guess, ode, solver="custom", method="rk4", stepsize=0.005, deltat
        ode : callable
              Callable function of the ODE to solve, in which the ODE is converted to a
              system of first order differential equations.
+
+       method : string
+                Desired method to solve the ODE. Options are 4th order Runge-Kutta
+                or Euler. These must be passed as "rk4" or "euler" respectively.
+                Only for custom solver.
+
+       stepsize : float
+                  Determines the size of the time step taken to compute the step for
+                  custom solver. Only for custom solver.
+
+       deltat_max : float
+                    Maximum time difference between two timestamps for solving.
+                    Only for custom solver.
+
+       plot: bool
+             Boolean value passed by the user; if True, a plot of the calculated
+             solutions of the ODE over the time period will be generated.
+
+       Returns
+       ---------
+       Array of length number of equations in system D + 1, where the first D entries
+       are the initial values for the limit cycle and the last entry is the period T
+       of the cycle.
     """
     cond = lambda guess, func: vector_eq(guess, func, solver=solver, method=method, stepsize=stepsize, deltat_max=deltat_max, index=index)
     solution = fsolve(cond, init_guess, ode)

@@ -25,6 +25,7 @@ def calc_lambda(deltat, deltax, params):
 
 def setup_env(mx, mt, params):
     """Initialises variables necessary for solving the PDE
+
        Parameters
        ---------
        mx : int
@@ -63,14 +64,27 @@ def setup_env(mx, mt, params):
     u_jp1 = np.zeros(x.size)  # u at next time step
     return x, t, deltax, deltat, u_j, u_jp1
 
-def p(t):
-    return t+7
-def q(t):
-    return t+7
-
 
 def zero_case(past_u_j, A):
+    """Forward Euler step for 0 valued boundary conditions.
+
+       Parameters
+       ---------
+       past_u_j : array, size(mx-1,)
+                  Initial vector solution of PDE for time t.
+
+       A : array, size(mx-1, mx-1)
+           Forward Euler tridiagonal matrix.
+
+       Returns
+       ---------
+       u_j : array, size(mx+1,)
+             Solution vector at time t+1.
+
+    """
+    # Compute solution
     sol = A.dot(past_u_j)
+    # Add boundary values
     u_j = [0]
     for element in sol:
         u_j.append(element)
@@ -79,11 +93,42 @@ def zero_case(past_u_j, A):
 
 
 def dirichlet_case(past_u_j, A, lmbda, mt, bound_funcs):
+    """Forward Euler step for Dirichlet boundary conditions.
+
+       Parameters
+       ---------
+       past_u_j : array, size(mx-1,)
+                  Initial vector solution of PDE for time t.
+
+       A : array, size(mx-1, mx-1)
+           Forward Euler tridiagonal matrix.
+
+       lmbda : float
+               Lambda value of diffusive heat equation for chosen resolution.
+
+       mt : int
+            Time index.
+
+       bound_funcs : tuple, size(2,)
+                    Tuple of functions describing the conditions at the boundaries
+                    for Dirichlet case.
+
+       Returns
+       ---------
+       u_j : array, size(mx+1,)
+             Solution vector at time t+1.
+
+    """
+    # Create vector
     dir_vec = np.zeros(len(past_u_j))
+    # Extract boundary functions
     p, q = bound_funcs
+    # Compute boundary values
     dir_vec[0] = p(mt)
     dir_vec[-1] = q(mt)
+    # Compute solution
     sol = A.dot(past_u_j) + lmbda * np.array(dir_vec)
+    # Add boundary values
     u_j = [p(mt)]
     for element in sol:
         u_j.append(element)
@@ -92,25 +137,73 @@ def dirichlet_case(past_u_j, A, lmbda, mt, bound_funcs):
 
 
 def neumann_case(past_u_j, A, lmbda, mt, deltax, bound_funcs):
-    p, q = bound_funcs
-    past_u_j = np.append(p(mt), past_u_j)
-    past_u_j = np.append(past_u_j, q(mt))
+    """Forward Euler step for Neumann boundary conditions.
+
+       Parameters
+       ---------
+       past_u_j : array, size(mx+1,)
+                  Initial vector solution of PDE for time t.
+
+       A : array, size(mx+1, mx+1)
+           Forward Euler tridiagonal matrix.
+
+       lmbda : float
+               Lambda value of diffusive heat equation for chosen resolution.
+
+       mt : int
+            Time index.
+
+       deltax : float
+                Chosen step size in space.
+
+       bound_funcs : tuple, size(2,)
+                    Tuple of functions describing the conditions at the boundaries
+                    for Neumann case (rate of diffusion).
+
+       Returns
+       ---------
+       u_j : array, size(mx+1,)
+             Solution vector at time t+1.
+
+    """
+
     dir_vec = np.zeros(len(past_u_j))
+    # Extract boundary functions
     p, q = bound_funcs
+    # Add boundary info
     dir_vec[0] = -p(mt)
     dir_vec[-1] = q(mt)
+    # Solve
     sol = A.dot(past_u_j) + 2*lmbda * deltax*np.array(dir_vec)
     u_j = []
     for element in sol:
         u_j.append(element)
-    print(u_j)
+    # Return solution vector
     return u_j
 
 def periodic_case(past_u_j, A):
+    """Forward Euler step for periodic boundary conditions.
+
+       Parameters
+       ---------
+       past_u_j : array, size(mx,)
+                  Initial vector solution of PDE for time t.
+
+       A : array, size(mx, mx)
+           Forward Euler tridiagonal matrix.
+
+       Returns
+       ---------
+       u_j : array, size(mx+1,)
+             Solution vector at time t+1.
+
+    """
+    # Solve
     sol = A.dot(past_u_j)
     u_j = []
     for element in sol:
         u_j.append(element)
+    # Return solution vector
     u_j = np.append(u_j, u_j[-1])
     return u_j
 
@@ -118,7 +211,7 @@ def heat_source(f, x, t, deltat):
     return deltat*f(x,t)
 
 
-def forward_euler(lmbda, u_j, mx, mt, deltax, deltat, bound_funcs=(p, q), boundary_conds="zero", pde_type="", heat_func=None):
+def forward_euler(lmbda, u_j, mx, mt, deltax, deltat, bound_funcs=None, boundary_conds="zero", pde_type="", heat_func=None):
     """Approximates the PDE solution using forward euler finite difference.
 
        Parameters
@@ -134,6 +227,31 @@ def forward_euler(lmbda, u_j, mx, mt, deltax, deltat, bound_funcs=(p, q), bounda
        mt : int
             Number of grid points in time.
 
+       deltax : float
+                Step size in space.
+
+       deltat : float
+                Step size in time
+
+       bound_funcs : tuple, size(2,)
+                    Tuple of functions used for non-homogeneous Dirichlet or Neumann
+                    boundary conditions. Functions correspond to values/derivatives
+                    at boundaries. Default is None.
+
+       boundary_conds : string
+                        String specifying the PDE problem's form. Available methods for
+                        zero valued boundaries ("zero"), Dirichlet boundary conditions
+                        ("dirichlet"), Neumann boundary conditions ("neumann") and
+                        periodic boundary conditions ("periodic"). Default is "zero".
+
+       pde_type : string
+                  String specifying the type of PDE. Default is regular diffusive heat.
+                  Available methods are addtional heat source F(x,t), used by passing
+                  "heat_source" as pde_type.
+
+       heat_func : callable
+                   Function F(x,t) describing the additional heat source in the problem for
+                   heat_source PDE type. Default is None
        Returns
        ---------
        Solution vector at the last point in time array using forward euler."""
@@ -145,17 +263,21 @@ def forward_euler(lmbda, u_j, mx, mt, deltax, deltat, bound_funcs=(p, q), bounda
     # Calculate for each time step
     for i in range(mt):
         past_u_j = u_j[1:mx]
+        # Zero boundary valued case
         if boundary_conds == "zero":
             u_j = zero_case(past_u_j, A)
+        # Dirichlet BCs
         if boundary_conds == "dirichlet":
             u_j = dirichlet_case(past_u_j, A, lmbda, mt, bound_funcs)
+        # Neumann BCs
         if boundary_conds == "neumann":
             n = round(mx + 1)
             k = np.array([lmbda * np.ones(n - 1), np.ones(n) - 2 * lmbda, lmbda * np.ones(n - 1)],
                          dtype=np.dtype(object))
             offset = [-1, 0, 1]
             A = diags(k, offset).toarray()
-            u_j = neumann_case(past_u_j, A, lmbda, mt, deltax, bound_funcs)
+            u_j = neumann_case(u_j, A, lmbda, mt, deltax, bound_funcs)
+        # Periodic BCs
         if boundary_conds == "periodic":
             past_u_j = u_j[:mx]
             n = round(mx)
@@ -166,18 +288,19 @@ def forward_euler(lmbda, u_j, mx, mt, deltax, deltat, bound_funcs=(p, q), bounda
             A[-1][0] = lmbda
             A[0][-1] = lmbda
             u_j = periodic_case(past_u_j, A)
+        # Heat source i
         if pde_type == "heat_source":
             heat_vec = np.zeros(len(u_j))
             for j in range(len(heat_vec)):
                 heat_vec[j] = heat_source(heat_func, j, mx*deltat, deltat)
-
             u_j = np.array(u_j) + heat_vec
     # Return final vector
     return u_j
 
 
 def backwards_euler(lmbda, u_j, mx, mt):
-    """Approximates the PDE solution using backward euler finite difference.
+    """Approximates the PDE solution using backward euler finite difference. Only for regular
+        heat diffusion equation with 0 valued boundaries.
 
        Parameters
        ---------
@@ -214,6 +337,7 @@ def backwards_euler(lmbda, u_j, mx, mt):
 
 def crank_nicholson(lmbda, u_j, mx, mt):
     """Approximates the PDE solution using Crank-Nicholson method for finite difference.
+        Only for regular heat diffusion equation with 0 valued boundaries.
 
        Parameters
        ---------
@@ -255,7 +379,7 @@ def crank_nicholson(lmbda, u_j, mx, mt):
     return u_j
 
 
-def pde_solver(u_I, params, mx=100, mt=100, boundary_conds="zero", pde_type="", method="ck", heat_func=None, plot=False):
+def pde_solver(u_I, params, mx=100, mt=100, bound_funcs=None, boundary_conds="zero", pde_type="", method="f-euler", heat_func=None, plot=False):
     """Top level PDE solver. Returns PDE solution values approximated with chosen
         method.
 
@@ -273,9 +397,29 @@ def pde_solver(u_I, params, mx=100, mt=100, boundary_conds="zero", pde_type="", 
        mt : int
             Number of grid points in time.
 
+       bound_funcs : tuple, size(2,)
+                    Tuple of functions used for non-homogeneous Dirichlet or Neumann
+                    boundary conditions. Functions correspond to values/derivatives
+                    at boundaries. Default is None.
+
+       boundary_conds : string
+                        String specifying the PDE problem's form. Available methods for
+                        zero valued boundaries ("zero"), Dirichlet boundary conditions
+                        ("dirichlet"), Neumann boundary conditions ("neumann") and
+                        periodic boundary conditions ("periodic"). Default is "zero".
+
+       pde_type : string
+                  String specifying the type of PDE. Default is regular diffusive heat.
+                  Available methods are addtional heat source F(x,t), used by passing
+                  "heat_source" as pde_type.
+
        method : str
                 Method to solve the PDE (Forward Euler : "f-euler", Backward Euler :
                 "b-euler" and Crank-Nicholson : "ck")
+
+       heat_func : callable
+                   Function F(x,t) describing the additional heat source in the problem for
+                   heat_source PDE type. Default is None
 
        plot: bool
              Boolean value passed by the user; if True, a plot of the calculated
@@ -294,18 +438,22 @@ def pde_solver(u_I, params, mx=100, mt=100, boundary_conds="zero", pde_type="", 
         u_j[i] = u_I(x[i], params)
     u_j[0] = 0
     u_j[mx] = 0
-
+    # Crank-Nicholcon Case
     if method == "ck":
         u_j = crank_nicholson(lmbda, u_j, mx, mt)
+    # Forward Euler Case
     elif method == "f-euler":
         if lmbda < 0.5:
-            u_j = forward_euler(lmbda, u_j, mx, mt, deltax, deltat, boundary_conds=boundary_conds, pde_type=pde_type, heat_func=heat_func)#change this hard code
+            u_j = forward_euler(lmbda, u_j, mx, mt, deltax, deltat,
+                                bound_funcs=bound_funcs, boundary_conds=boundary_conds, pde_type=pde_type, heat_func=heat_func)
         else:
+            # Stability Issues
             print("Leads to unstable solutions, change grid properties.")
             return
+    # Backward Euler Case
     elif method == "b-euler":
         u_j = crank_nicholson(lmbda, u_j, mx, mt)
-
+    # Plot
     if plot:
         plt.plot(x, u_j, 'ro', label='num')
         plt.show()

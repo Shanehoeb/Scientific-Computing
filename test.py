@@ -15,7 +15,8 @@ def pred_prey(t, z, p):
     return np.array((dxdt, dydt))
 
 pred_ode = lambda t, u: pred_prey(t, u, defaults_pred_prey())
-
+initialu = (0.79912268, 0.18061336)
+t_span = (0, 100)
 
 class MyTestCase(unittest.TestCase):
     def test_test(self):
@@ -48,19 +49,19 @@ class MyTestCase(unittest.TestCase):
         assert np.isclose(t1, t_2) and np.allclose(sol1, real_eul)  # Test euler
 
     def test_solve_ode(self):
-        assert np.isclose(solve_ode(pred_ode, (0, 100), (0.79912268, 0.18061336), stepsize=0.005, method="rk4")[1][-1][-1], 0.27005439464182407)
+        assert np.isclose(solve_ode(pred_ode, t_span, initialu, stepsize=0.005, method="rk4")[1][-1][-1], 0.27005439464182407)
 
     def test_scipy_solver(self):
-        assert "a" == "a"
+        assert np.isclose(scipy_solver(pred_ode, initialu, t_span)[-1][-1][-1], 0.26763146225072443)
 
     def test_my_solver(self):
-        assert np.isclose(pp.my_solver(pred_ode, (0.79912268, 0.18061336), (0, 100))[1][-1][-1], 0.27005439464182407)
+        assert np.isclose(pp.my_solver(pred_ode, initialu, t_span)[1][-1][-1], 0.27005439464182407)
 
     def test_time_simulation(self):
-        assert np.isclose(pp.time_simulation(pred_ode, (0.79912268, 0.18061336), (0, 100))[1][-1][-1], 0.27005439464182407)
+        assert np.isclose(pp.time_simulation(pred_ode, initialu, t_span)[1][-1][-1], 0.27005439464182407)
 
     def test_orbit(self):
-        assert np.isclose(pp.orbit(pred_ode, (0.79912268, 0.18061336), (0, 100))[1][-1][-1], 0.27005439464182407)
+        assert np.isclose(pp.orbit(pred_ode, (0.79912268, 0.18061336), t_span)[1][-1][-1], 0.27005439464182407)
 
     def test_nullcline(self):
         # Good - check values match nullcline definition (approximately)
